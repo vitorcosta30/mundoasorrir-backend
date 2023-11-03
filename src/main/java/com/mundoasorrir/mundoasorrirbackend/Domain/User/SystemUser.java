@@ -11,7 +11,7 @@ public class SystemUser {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long userId;
     private String email;
-
+    @Column(unique=true)
     private String username;
 
     private String password;
