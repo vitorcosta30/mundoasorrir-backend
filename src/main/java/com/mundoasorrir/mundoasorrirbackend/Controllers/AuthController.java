@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
@@ -9,11 +10,16 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.UserInfoResponse;
+import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
+import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
+import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
+import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 //for Angular Client (withCredentials)
 //@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -44,14 +50,16 @@ public class AuthController {
 
     @Autowired
     UserRepository userRepository;
-
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
-
+    @Autowired
+    RefreshTokenService refreshTokenService;
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -92,11 +100,20 @@ public class AuthController {
 
         String strRoles = signUpRequest.getRole();
         Role[] roles = BaseRoles.systemRoles();
+        List<Role> rolesSaved = roleRepository.findAll();
         if(strRoles == null ){
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Role is null!"));
         }
         for(int i = 0 ; i < roles.length ; i++){
             if( strRoles.equalsIgnoreCase(roles[i].getName())){
+
+                    for(int x = 0 ; x < rolesSaved.size();x++){
+                        if(rolesSaved.get(x).equals(roles[i]));{
+                            systemUser.setRoles(rolesSaved.get(x));
+                            userRepository.save(systemUser);
+                            return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+                        }
+                    }
                 systemUser.setRoles(roles[i]);
                 userRepository.save(systemUser);
                 return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -113,4 +130,27 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
+        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+
+        if ((refreshToken != null) && (refreshToken.length() > 0)) {
+            return refreshTokenService.findByToken(refreshToken)
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(UserDetailsImpl.build(user));
+
+                        return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .body(new MessageResponse("Token is refreshed successfully!"));
+                    })
+                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
+                            "Refresh token is not in database!"));
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
+    }
+
 }

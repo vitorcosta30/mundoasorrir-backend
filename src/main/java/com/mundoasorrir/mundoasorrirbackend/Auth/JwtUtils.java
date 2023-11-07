@@ -29,6 +29,7 @@ public class JwtUtils {
     @Value("${mundoasorrir.app.jwtCookieName}")
     private String jwtCookie;
 
+
     public String getJwtFromCookies(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if (cookie != null) {
@@ -37,7 +38,9 @@ public class JwtUtils {
             return null;
         }
     }
-
+    public String getJwtRefreshFromCookies(HttpServletRequest request) {
+        return getCookieValueByName(request, jwtCookie);
+    }
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
@@ -82,5 +85,13 @@ public class JwtUtils {
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+    private String getCookieValueByName(HttpServletRequest request, String name) {
+        Cookie cookie = WebUtils.getCookie(request, name);
+        if (cookie != null) {
+            return cookie.getValue();
+        } else {
+            return null;
+        }
     }
 }
