@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 @Table(name = "system_role")
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sys_role_id")
     private Long sysRoleId;
 
-    @Column(length = 20)
+    @Column(length = 20, unique = true)
     private String name;
 
     public Role() {
@@ -18,11 +18,16 @@ public class Role {
         this.name = name;
     }
 
+    public Role(Long sysRoleId, String name) {
+        this.sysRoleId = sysRoleId;
+        this.name = name;
+    }
+
     public Long getSysRoleId() {
         return sysRoleId;
     }
-    public static Role valueOf(final String role) {
-        return new Role(role);
+    public static Role valueOf(final long id,final String role) {
+        return new Role(id,role);
     }
 
     public void setSysRoleId(Long id) {
@@ -35,5 +40,10 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

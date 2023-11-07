@@ -4,11 +4,11 @@ public final class BaseRoles {
     /**
      * poweruser
      */
-    public static final Role MANAGER = Role.valueOf("MANAGER");
+    public static final Role MANAGER = Role.valueOf(2,"MANAGER");
     /**
      * Utente
      */
-    public static final Role EMPLOYEE = Role.valueOf("EMPLOYEE");
+    public static final Role EMPLOYEE = Role.valueOf(1,"EMPLOYEE");
 
     /**
      * get available role types for adding new users

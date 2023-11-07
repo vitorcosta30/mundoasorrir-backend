@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,10 +11,13 @@ public class SystemUser {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long userId;
+    @Getter
     private String email;
+    @Getter
     @Column(unique=true)
     private String username;
 
+    @Getter
     private String password;
     @ManyToOne(cascade = CascadeType.ALL)
     private Role systemRole;
@@ -37,25 +41,14 @@ public class SystemUser {
         this.userId = identifier;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
     public void setRoles(Role role) {
         this.systemRole = role;
     }
