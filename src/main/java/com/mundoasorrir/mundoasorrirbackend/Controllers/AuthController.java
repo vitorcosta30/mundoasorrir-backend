@@ -1,5 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,6 +18,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseEvent;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
@@ -22,8 +26,11 @@ import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,12 +38,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 //for Angular Client (withCredentials)
@@ -47,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(EventsController.class);
 
     @Autowired
     UserRepository userRepository;
@@ -83,6 +86,26 @@ public class AuthController {
                         roles));
     }
 
+    @GetMapping("/isLoggedIn")
+    public ResponseEntity<Boolean> isLoggedIn(HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty());
+    }
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUser(HttpServletRequest request) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+        SystemUser usr = userRepository.findByUsername(username).get();
+        List<String> roles = usr.getSystemRole().stream()
+                .map(item -> item.getName())
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(new UserInfoResponse(usr.getUserId(),
+                usr.getUsername(),
+                usr.getEmail(),
+                roles));
+
+
+
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -105,16 +128,20 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Role is null!"));
         }
         for(int i = 0 ; i < roles.length ; i++){
-            if( strRoles.equalsIgnoreCase(roles[i].getName())){
+            if( strRoles.equals(roles[i].getName())){
+                logger.warn(strRoles + " - " +roles[i].getName());
 
                     for(int x = 0 ; x < rolesSaved.size();x++){
-                        if(rolesSaved.get(x).equals(roles[i]));{
+                        if(rolesSaved.get(x).getName().equals(roles[i].getName())){
+                            logger.warn(roles[i].getName() + " - " +rolesSaved.get(x));
+
                             systemUser.setRoles(rolesSaved.get(x));
                             userRepository.save(systemUser);
                             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
                         }
                     }
                 systemUser.setRoles(roles[i]);
+                roleRepository.save(roles[i]);
                 userRepository.save(systemUser);
                 return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
             }
