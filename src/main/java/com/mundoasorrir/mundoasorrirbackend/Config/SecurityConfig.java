@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthEntryPointJwt;
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthTokenFilter;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
@@ -96,6 +97,8 @@ public class SecurityConfig { // extends WebSecurityConfigurerAdapter {
                                 .requestMatchers("/api/test/**").permitAll()
                                 .anyRequest().authenticated()
                 );
+
+
         /*
         http
                 .cors(httpSecurityCorsConfigurer -> {
