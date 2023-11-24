@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 public class UserDetailsServiceImpl  implements UserDetailsService{
     @Autowired
@@ -19,5 +22,14 @@ public class UserDetailsServiceImpl  implements UserDetailsService{
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return UserDetailsImpl.build(systemUser);
+    }
+
+    public SystemUser findUserByUsername(String username) throws UsernameNotFoundException {
+
+        return   userRepository.findByUsername(username).get();
+    }
+    public List<SystemUser> findAll()  {
+
+        return   userRepository.findAll();
     }
 }
