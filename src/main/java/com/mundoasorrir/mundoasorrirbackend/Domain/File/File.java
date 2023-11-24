@@ -1,6 +1,9 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.File;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class File {
@@ -10,20 +13,28 @@ public class File {
     private Long id;
     private String name;
     private String type;
+    @ManyToMany
+    private List<SystemUser> usersAllowed;
+
+    @ManyToOne
+    private SystemUser sharedBy;
+
+
 
     //private Long owner;
 
     @Lob
-    @Column(length = Integer.MAX_VALUE)
+    @Column(columnDefinition = "BLOB")
     private byte[] data;
 
 
     public File() {}
 
-    public File(String name, String type, byte[] data) {
+    public File(String name, String type, byte[] data, List<SystemUser> usersAllowed) {
         this.name = name;
         this.type = type;
         this.data = data;
+        this.usersAllowed = usersAllowed;
     }
 
 
@@ -51,7 +62,20 @@ public class File {
         return data;
     }
 
+    public boolean isUserAllowed(SystemUser user){
+        return this.usersAllowed.contains(user);
+    }
+
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public SystemUser getSharedBy() {
+        return sharedBy;
+    }
+
+    public void setSharedBy(SystemUser sharedBy) {
+        this.sharedBy = sharedBy;
+        this.usersAllowed.add(sharedBy);
     }
 }

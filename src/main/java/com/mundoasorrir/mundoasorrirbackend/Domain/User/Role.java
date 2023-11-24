@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 public class Role {
     @Id
     @Column(name = "sys_role_id")
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long sysRoleId;
 
     @Column(length = 20, unique = true)
@@ -26,8 +27,8 @@ public class Role {
     public Long getSysRoleId() {
         return sysRoleId;
     }
-    public static Role valueOf(final long id,final String role) {
-        return new Role(id,role);
+    public static Role valueOf(final String role) {
+        return new Role(role);
     }
 
     public void setSysRoleId(Long id) {

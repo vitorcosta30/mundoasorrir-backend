@@ -2,13 +2,20 @@ package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
 public final class BaseRoles {
     /**
-     * poweruser
+     * Coordenador
      */
-    public static final Role MANAGER = Role.valueOf(2,"MANAGER");
+    public static final Role MANAGER = Role.valueOf("MANAGER");
     /**
-     * Utente
+     * Colaborador
      */
-    public static final Role EMPLOYEE = Role.valueOf(1,"EMPLOYEE");
+    public static final Role EMPLOYEE = Role.valueOf("EMPLOYEE");
+    /**
+     * Diretor
+     */
+
+
+    public static final Role DIRECTOR = Role.valueOf("DIRECTOR");
+
 
     /**
      * get available role types for adding new users
@@ -16,7 +23,7 @@ public final class BaseRoles {
      * @return
      */
     public static Role[] systemRoles() {
-        return new Role[] {MANAGER, EMPLOYEE };
+        return new Role[] {MANAGER, EMPLOYEE, DIRECTOR };
     }
 
 

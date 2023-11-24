@@ -1,13 +1,16 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Entity
 @Table(name = "sys_user")
 public class SystemUser {
+    @Getter
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long userId;
@@ -19,6 +22,7 @@ public class SystemUser {
 
     @Getter
     private String password;
+
     @ManyToOne(cascade = CascadeType.ALL)
     private Role systemRole;
 
@@ -32,10 +36,6 @@ public class SystemUser {
 
     }
 
-
-    public Long getUserId() {
-        return userId;
-    }
 
     public void setUserId(Long identifier) {
         this.userId = identifier;
@@ -55,6 +55,9 @@ public class SystemUser {
     public void setPassword(String password) {
         this.password = password;
     }
+    public Role getRole(){
+        return this.systemRole;
+    }
 
     public Set<Role> getSystemRole() {
         Set<Role> roles = new HashSet<>(1);
@@ -63,4 +66,6 @@ public class SystemUser {
 
         return roles;
     }
+
+
 }

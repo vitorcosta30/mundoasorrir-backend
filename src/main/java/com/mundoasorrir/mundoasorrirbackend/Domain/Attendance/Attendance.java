@@ -5,6 +5,8 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import jakarta.persistence.*;
 import org.springframework.data.util.Pair;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -12,9 +14,8 @@ public class Attendance {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long attendanceEventId;
-
-    @OneToOne
-    private Event event;
+    @Column(unique = true)
+    private Date dayAttendance;
 
     @OneToMany
     private List<Present> userAttendance;
@@ -24,4 +25,60 @@ public class Attendance {
     }
 
 
+    public Attendance(Date dayAttendance) {
+        this.dayAttendance = dayAttendance;
+        this.userAttendance = new ArrayList<>();
+    }
+
+    public Attendance(Date dayAttendance, List<SystemUser> users) {
+        this.dayAttendance = dayAttendance;
+        this.userAttendance = intantiatePresenceList(users);
+    }
+    public boolean isUserIn(SystemUser user){
+        return userAttendance.contains(user);
+
+    }
+
+    public void markPresent(SystemUser user){
+        if(!isUserIn(user)){
+            getPresence(user).wasPresent();
+        }else{
+            return;
+        }
+    }
+    public void markAbsent(SystemUser user){
+        if(!isUserIn(user)){
+            getPresence(user).wasAbsent();
+        }else{
+            return;
+        }
+    }
+
+
+    private Present getPresence(SystemUser user){
+        for(int i = 0; i < this.userAttendance.size();i++){
+            if(user.equals(this.userAttendance.get(i).getUser())){
+                return this.userAttendance.get(i);
+            }
+        }
+        return null;
+    }
+
+    private List<Present> intantiatePresenceList(List<SystemUser> users){
+        List<Present> userAttedance = new ArrayList<>();
+        for(int i = 0 ; i < users.size();i++){
+            userAttedance.add(new Present(users.get(i)));
+        }
+        return userAttedance;
+    }
+
+    public List<SystemUser> getUsersUnmarked(){
+        List<SystemUser> usersUnmarked = new ArrayList<>();
+        for(int i = 0 ; i < this.userAttendance.size(); i++){
+            if(this.userAttendance.get(i).getPresenceStatus().getStatus().equalsIgnoreCase(BasePresenceStatus.UNMARKED.getStatus())){
+                usersUnmarked.add(this.userAttendance.get(i).getUser());
+            }
+        }
+        return usersUnmarked;
+    }
 }
