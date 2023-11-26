@@ -35,6 +35,7 @@ public class JwtUtils {
         if (cookie != null) {
             return cookie.getValue();
         } else {
+
             return null;
         }
     }
@@ -54,6 +55,7 @@ public class JwtUtils {
 
     public String getUserNameFromJwtToken(String token) {
         if(token == null || token.isEmpty() || token.isBlank()   || !validateJwtToken(token)){
+
             return "";
         }
         return Jwts.parserBuilder().setSigningKey(key()).build()
