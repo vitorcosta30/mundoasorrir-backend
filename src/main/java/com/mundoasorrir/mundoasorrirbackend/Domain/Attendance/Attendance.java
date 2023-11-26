@@ -81,4 +81,28 @@ public class Attendance {
         }
         return usersUnmarked;
     }
+
+    public Long getAttendanceEventId() {
+        return attendanceEventId;
+    }
+
+    public void setAttendanceEventId(Long attendanceEventId) {
+        this.attendanceEventId = attendanceEventId;
+    }
+
+    public Date getDayAttendance() {
+        return dayAttendance;
+    }
+
+    public void setDayAttendance(Date dayAttendance) {
+        this.dayAttendance = dayAttendance;
+    }
+
+    public List<Present> getUserAttendance() {
+        return userAttendance;
+    }
+
+    public void setUserAttendance(List<Present> userAttendance) {
+        this.userAttendance = userAttendance;
+    }
 }

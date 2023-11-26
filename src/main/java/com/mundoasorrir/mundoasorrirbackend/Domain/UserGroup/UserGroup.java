@@ -22,15 +22,19 @@ public class UserGroup {
     @Getter
     private String groupDesignation;
 
+    @ManyToOne
+    private SystemUser createdBy;
+
 
     @Getter
     @ManyToMany
     private List<SystemUser> groupUsers;
 
 
-    public UserGroup(String groupDesignation, String groupName) {
+    public UserGroup(String groupDesignation, SystemUser createdBy, String groupName) {
         this.groupName = groupName;
         this.groupDesignation = groupDesignation;
+        this.createdBy = createdBy;
         this.groupUsers = new ArrayList<>();
     }
 
@@ -39,15 +43,22 @@ public class UserGroup {
 
     }
 
-    public UserGroup(String groupName, String groupDesignation, List<SystemUser> groupUsers) {
+    public UserGroup(String groupName,SystemUser createdBy, String groupDesignation, List<SystemUser> groupUsers) {
         this.groupName = groupName;
         this.groupDesignation = groupDesignation;
+        this.createdBy = createdBy;
+
         this.groupUsers = groupUsers;
     }
 
     public void addUser(SystemUser newUser){
         if(!isUserInGroup(newUser)){
             this.groupUsers.add(newUser);
+        }
+    }
+    public void removeUser(SystemUser user){
+        if(isUserInGroup(user)){
+            this.groupUsers.remove(user);
         }
     }
 
@@ -90,5 +101,13 @@ public class UserGroup {
 
     public void setGroupUsers(List<SystemUser> groupUsers) {
         this.groupUsers = groupUsers;
+    }
+
+    public SystemUser getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(SystemUser createdBy) {
+        this.createdBy = createdBy;
     }
 }
