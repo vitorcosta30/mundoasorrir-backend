@@ -1,5 +1,6 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.FileRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserGroupRepository;
@@ -18,6 +19,11 @@ public class UserGroupService {
     public UserGroup findByGroupId(Long groupId){
         return this.userGroupRepository.getReferenceById(groupId);
     }
+    public UserGroup getByGroupId(Long groupId){
+        return this.userGroupRepository.getUserGroupByGroupIdEquals(groupId);
+    }
+
+
     public UserGroup save(UserGroup userGroup){
         return this.userGroupRepository.save(userGroup);
     }
@@ -26,6 +32,18 @@ public class UserGroupService {
     }
     public List<UserGroup> findAll(){
         return this.userGroupRepository.findAll();
+    }
 
+    public List<SystemUser> getUsersInGroup(Long groupId){
+        return this.userGroupRepository.getUsersInGroup(groupId);
+    }
+    public UserGroup removeUser(SystemUser user, Long groupId){
+        UserGroup group = getByGroupId(groupId);
+        group.removeUser(user);
+        return save(group);
+    }
+
+    public Boolean isUserCreator(SystemUser user, Long groupId){
+        return findByGroupId(groupId).isUserInGroup(user);
     }
 }
