@@ -18,7 +18,6 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
-import com.mundoasorrir.mundoasorrirbackend.Message.ResponseEvent;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;

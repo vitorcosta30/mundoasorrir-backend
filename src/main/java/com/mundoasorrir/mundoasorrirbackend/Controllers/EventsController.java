@@ -14,7 +14,6 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
-import com.mundoasorrir.mundoasorrirbackend.Message.ResponseEvent;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseFile;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventRepository;
@@ -63,11 +62,9 @@ public class EventsController {
 
     private final UserGroupService userGroupService;
     @GetMapping("/getEvents")
-    public ResponseEntity<List<ResponseEvent>> getEvents(HttpServletRequest request) {
+    public ResponseEntity<List<EventDTO>> getEvents(HttpServletRequest request) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-        List<ResponseEvent> userEvents = eventService.getAllEventsFromUsername(username).map(event ->{
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                return new ResponseEvent(event.getEventType().getName(),dateFormat.format(event.getStartDate()),dateFormat.format(event.getEndDate()),"Test event title",event.getEventId());}).collect(Collectors.toList());
+        List<EventDTO> userEvents = EventMapper.toDTO(eventService.getAllEventsFromUsername(username).toList());
 
 
         logger.info("Events fetched for user "+username);
@@ -76,12 +73,8 @@ public class EventsController {
     }
 
     @GetMapping("/getUserEvents/{username}")
-    public ResponseEntity<List<ResponseEvent>> getUserEvents(@PathVariable String username) {
-        List<ResponseEvent> userEvents = eventService.getAllEventsFromUsername(username).map(event ->{
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            return new ResponseEvent(event.getEventType().getName(),dateFormat.format(event.getStartDate()),dateFormat.format(event.getEndDate()),event.getEventType().getName(),event.getEventId());}).collect(Collectors.toList());
-
-
+    public ResponseEntity<List<EventDTO>> getUserEvents(@PathVariable String username) {
+        List<EventDTO> userEvents = EventMapper.toDTO(eventService.getAllEventsFromUsername(username).toList());
         logger.info("Events fetched for user "+username);
         return ResponseEntity.status(HttpStatus.OK).body(userEvents);
 

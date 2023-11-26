@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
+import com.mundoasorrir.mundoasorrirbackend.DTO.Presence.PresenceMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Vacation.VacationDTO;
@@ -48,7 +49,7 @@ public class AttendanceController {
     }
 
     @PostMapping("/getUsersUnmarked")
-    public ResponseEntity<?> getUsersForDayAttendance(@RequestParam("obsDate")String date){
+    public ResponseEntity<?> getUsersForDayAttendance(@RequestParam("obsDate")String date) {
         Date obsDate ;
         try{
             obsDate = handleDate(date);
@@ -62,6 +63,24 @@ public class AttendanceController {
             attendanceService.save(obsDate,users);
         }
         return ResponseEntity.ok().body(UserMapper.toDTO(this.attendanceService.getAttendanceUnmarkedByDate(obsDate)));
+    }
+
+
+    @PostMapping("/getAttendanceSheet")
+    public ResponseEntity<?> getAttendanceSheet(@RequestParam("obsDate")String date) {
+        Date obsDate ;
+        try{
+            obsDate = handleDate(date);
+
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
+        }
+        if(!this.attendanceService.isInstantiated(obsDate)){
+            List<SystemUser> users = userService.findAll();
+            users.removeAll(eventService.usersBusy(obsDate));
+            attendanceService.save(obsDate,users);
+        }
+        return ResponseEntity.ok().body(PresenceMapper.toDTO(this.attendanceService.getPresencesInDay(obsDate)));
     }
     @PostMapping("/markPresent")
     public ResponseEntity<?> markPresent(@RequestParam("username") String username, @RequestParam("obsDate")String date){
@@ -108,7 +127,7 @@ public class AttendanceController {
 
     private Date handleDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String todayDateString = dateFormat.format(date);
-        return dateFormat.parse(todayDateString);
+        //String todayDateString = dateFormat.format(date);
+        return dateFormat.parse(date);
     }
 }

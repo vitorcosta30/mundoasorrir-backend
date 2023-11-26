@@ -34,12 +34,12 @@ public class UserGroupController {
     @Autowired
     JwtUtils jwtUtils;
     @PostMapping("/createGroup")
-    public ResponseEntity<?> createEvent(@RequestParam("groupName") String groupName, @RequestParam("groupDesignation") String groupDesignation, HttpServletRequest request, @RequestParam("users") List<String> users) {
+    public ResponseEntity<?> createGroup(@RequestParam("groupName") String groupName, @RequestParam("groupDesignation") String groupDesignation, HttpServletRequest request, @RequestParam("users") List<String> users) {
         List<SystemUser> usersInGroup = new ArrayList<>(this.getUsersFromUsername(users));
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         usersInGroup.add(this.userService.findUserByUsername(username));
 
-        UserGroup userGroup = new UserGroup(groupName,groupDesignation,usersInGroup);
+        UserGroup userGroup = new UserGroup(groupName,this.userService.findUserByUsername(username),groupDesignation,usersInGroup);
         String message = "";
 
         try {
@@ -52,10 +52,54 @@ public class UserGroupController {
         }
     }
     @GetMapping("/getGroupsSimple")
-    public ResponseEntity<List<UserGroupDTO>> getGroups() {
-        List<UserGroupDTO> res = UserGroupMapper.toDTO(userGroupService.findAll());
+    public ResponseEntity<List<UserGroupDTO>> getGroups( HttpServletRequest request) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+        List<UserGroupDTO> res = UserGroupMapper.toDTO(userGroupService.findUserGroups(username));
         return ResponseEntity.ok().body(res);
     }
+
+
+    @PostMapping("/isUserCreator")
+    public ResponseEntity<Boolean> isUserCreator(@RequestParam("groupId") Long groupId,HttpServletRequest request ){
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+        SystemUser user = this.userService.findUserByUsername(username);
+        return ResponseEntity.ok().body(this.userGroupService.isUserCreator(user,groupId));
+    }
+
+    @PostMapping("/leaveGroup")
+    public ResponseEntity<?> leaveGroup(@RequestParam("groupId") Long groupId,HttpServletRequest request ){
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+        SystemUser user = this.userService.findUserByUsername(username);
+        try{
+            this.userGroupService.removeUser(user,groupId);
+            return ResponseEntity.ok().body(new ResponseMessage("Left group successfully"));
+
+        }catch(Exception e){
+            return ResponseEntity.ok().body(new ResponseMessage("There was an error leaving the group"));
+        }
+    }
+
+    @PostMapping("/getUsersInGroup")
+    public ResponseEntity<?> getUsersInGroup(@RequestParam("groupId") Long groupId,HttpServletRequest request ){
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+        SystemUser user = this.userService.findUserByUsername(username);
+        try{
+            this.userGroupService.removeUser(user,groupId);
+            return ResponseEntity.ok().body(this.userGroupService.getUsersInGroup(groupId));
+
+        }catch(Exception e){
+            return ResponseEntity.ok().body(new ResponseMessage("There was an error getting the users!"));
+        }
+    }
+
+
+
+    @GetMapping(value = "/getGroupMembers/{id}")
+    public ResponseEntity<List<UserDTO>> getGroupMembers(@PathVariable Long id) {
+        List<UserDTO> res = UserMapper.toDTO(userGroupService.findByGroupId(id).getGroupUsers());
+        return ResponseEntity.ok().body(res);
+    }
+
     private List<SystemUser> getUsersFromUsername(List<String> users){
         List<SystemUser> res = new ArrayList<>();
         for(int i = 0; i < users.size(); i++){
