@@ -1,30 +1,31 @@
 package com.mundoasorrir.mundoasorrirbackend.DTO.Event;
 
-import java.util.Date;
-
 public class EventDTO {
     private String eventId;
 
-    private String startDate;
+    private String start;
 
-    private String endDate;
+    private String end;
 
     private String description;
 
     private String place;
 
+    private String type;
+
     public EventDTO(String eventId, String startDate, String endDate) {
         this.eventId = eventId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.start = startDate;
+        this.end = endDate;
     }
 
-    public EventDTO(String eventId, String startDate, String endDate, String description, String place) {
+    public EventDTO(String eventId, String startDate, String endDate, String description, String place, String type) {
         this.eventId = eventId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.start = startDate;
+        this.end = endDate;
         this.description = description;
         this.place = place;
+        this.type = type;
     }
 
     public String getEventId() {
@@ -35,20 +36,20 @@ public class EventDTO {
         this.eventId = eventId;
     }
 
-    public String getStartDate() {
-        return startDate;
+    public String getStart() {
+        return start;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setStart(String start) {
+        this.start = start;
     }
 
-    public String getEndDate() {
-        return endDate;
+    public String getEnd() {
+        return end;
     }
 
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
+    public void setEnd(String end) {
+        this.end = end;
     }
 
     public String getDescription() {
@@ -65,5 +66,13 @@ public class EventDTO {
 
     public void setPlace(String place) {
         this.place = place;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
