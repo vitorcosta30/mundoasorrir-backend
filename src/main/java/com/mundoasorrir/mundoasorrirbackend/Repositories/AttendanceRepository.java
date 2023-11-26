@@ -17,6 +17,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     Optional<Attendance> findByDayAttendanceEquals(Date date);
 
 
+    @Query("Select a.userAttendance from Attendance a where a.dayAttendance = :date ")
+    List<Present> getPresentStatusList(Date date);
+
+
 ;
 
 }
