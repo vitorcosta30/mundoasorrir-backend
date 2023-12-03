@@ -26,15 +26,32 @@ public class SystemUser {
     @ManyToOne(cascade = CascadeType.ALL)
     private Role systemRole;
 
+    @Getter
+    @Column(nullable = false)
+    private boolean isActive;
+
     public SystemUser(String username,String email, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.isActive = true;
     }
 
     public SystemUser() {
-
+        this.isActive = true;
     }
+
+    public void deactivate(){
+        if(this.isActive) {
+            this.isActive = false;
+        }
+    }
+    public void activate(){
+        if(!this.isActive) {
+            this.isActive = true;
+        }
+    }
+
 
 
     public void setUserId(Long identifier) {
@@ -68,4 +85,11 @@ public class SystemUser {
     }
 
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

@@ -4,14 +4,10 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Presence.PresenceMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
-import com.mundoasorrir.mundoasorrirbackend.DTO.Vacation.VacationDTO;
-import com.mundoasorrir.mundoasorrirbackend.DTO.Vacation.VacationMapper;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Attendance;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Services.AttendanceService;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +33,7 @@ public class AttendanceController {
 
     @Autowired
 
-    private final UserDetailsServiceImpl userService;
+    private final UserService userService;
     @GetMapping(value = "/getUsersBusyToday")
     public ResponseEntity<List<UserDTO>> getBusyUsers() throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

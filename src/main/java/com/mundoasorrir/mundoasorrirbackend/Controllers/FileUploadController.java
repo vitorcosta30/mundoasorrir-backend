@@ -7,7 +7,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseFile;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.FileUploadService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +34,7 @@ public class FileUploadController {
 
     private final FileUploadService fileUploadService;
 
-    private final UserDetailsServiceImpl userService;
+    private final UserService userService;
 
     private final UserGroupService userGroupService;
     @Autowired

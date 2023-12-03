@@ -13,15 +13,19 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.UserInfoResponse;
+import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangePasswordDTO;
+import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -48,10 +52,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
-    private static final Logger logger = LoggerFactory.getLogger(EventsController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
+
     @Autowired
     RoleRepository roleRepository;
 
@@ -64,6 +71,9 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        if(!this.userService.isUserActiveUsername(loginRequest.getUsername())){
+            return ResponseEntity.status(401).body(new ResponseMessage("Conta desativada, entre em contacto com alguem responsavel caso se trate de um erro"));
+        }
 
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -92,7 +102,7 @@ public class AuthController {
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(HttpServletRequest request) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-        SystemUser usr = userRepository.findByUsername(username).get();
+        SystemUser usr = userService.findUserByUsername(username);
         List<String> roles = usr.getSystemRole().stream()
                 .map(item -> item.getName())
                 .collect(Collectors.toList());
@@ -107,11 +117,11 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (userService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
@@ -135,19 +145,51 @@ public class AuthController {
                             logger.warn(roles[i].getName() + " - " +rolesSaved.get(x));
 
                             systemUser.setRoles(rolesSaved.get(x));
-                            userRepository.save(systemUser);
+                            userService.save(systemUser);
                             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
                         }
                     }
                 systemUser.setRoles(roles[i]);
                 roleRepository.save(roles[i]);
-                userRepository.save(systemUser);
+                userService.save(systemUser);
                 return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
             }
         }
 
 
         return ResponseEntity.badRequest().body(new MessageResponse("Error: Role does not exist!!"));
+    }
+
+    @PatchMapping("/changePassword/{username}")
+    public ResponseEntity<?> changePassoword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword){
+        if(!username.equals(newPassword.getUsername())){
+            return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
+        }
+        SystemUser user = this.userService.findUserByUsername(newPassword.getUsername());
+        user.setPassword(encoder.encode(newPassword.getNewPassword()));
+        try{
+            this.userService.save(user);
+            return ResponseEntity.ok().body(new MessageResponse("Password updated successfully!!"));
+
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new MessageResponse("There was an error!!"));
+
+        }
+
+    }
+    @PutMapping(value = "/updateUser/{idUser}")
+    public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser  ){
+        if(!idUser.toString().equals(updatedUser.getId())){
+            return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
+        }
+        try{
+            this.userService.updateUser(idUser,updatedUser);
+            return ResponseEntity.ok().body(new ResponseMessage("Data updated successfuly!!"));
+
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("An Error has occurred!!"));
+
+        }
     }
 
     @PostMapping("/signout")

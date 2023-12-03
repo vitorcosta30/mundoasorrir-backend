@@ -1,23 +1,22 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
-import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
-import com.mundoasorrir.mundoasorrirbackend.Services.FileUploadService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,9 +25,9 @@ import java.util.List;
 @CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-
 public class UserController {
-    private final UserDetailsServiceImpl userService;
+    @Autowired
+    private final UserService userService;
     @GetMapping(value = "/getInfo/{username}")
     public ResponseEntity<UserDTO> getUserInfo(@PathVariable String username) {
         //log.info("File name: {}", file.getOriginalFilename());
@@ -48,6 +47,57 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> res = UserMapper.toDTO(userService.findAll());
         return ResponseEntity.ok().body(res);
+    }
+
+
+
+    @RequestMapping(value = "/updateUser/{idUser}",method = {RequestMethod.OPTIONS,RequestMethod.PUT}, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser , HttpServletRequest request ){
+        if(!idUser.toString().equals(updatedUser.getId())){
+            return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
+        }
+        if (userService.existsByUsername(idUser,updatedUser)) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userService.existsByEmail(idUser,updatedUser)) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+
+        try{
+
+
+            this.userService.updateUser(idUser,updatedUser);
+            return ResponseEntity.ok().body(new ResponseMessage("Data updated successfuly!!"));
+
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("An Error has occurred!!"));
+
+        }
+    }
+
+
+
+
+    @PostMapping(value="/deactivateAccount")
+    public ResponseEntity<?> deactivateAccount(@RequestParam("username") String username){
+        try{
+            this.userService.deactivateUser(username);
+            return ResponseEntity.ok(new MessageResponse("Account deactivated successfully!"));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("There was an error in the deactivation the account"));
+        }
+    }
+
+    @PostMapping(value="/activateAccount")
+    public ResponseEntity<?> activateAccount(@RequestParam("username") String username){
+        try{
+            this.userService.activateUser(username);
+            return ResponseEntity.ok(new MessageResponse("Account activated successfully!"));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("There was an error in the activation the account"));
+        }
     }
 
 }

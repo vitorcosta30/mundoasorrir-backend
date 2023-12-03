@@ -3,6 +3,7 @@ package com.mundoasorrir.mundoasorrirbackend.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 //import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,12 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthEntryPointJwt;
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthTokenFilter;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 
-import java.util.Arrays;
+import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 
 @Configuration
 //@EnableWebSecurity
@@ -34,7 +32,7 @@ import java.util.Arrays;
 //prePostEnabled = true) // by default
 public class SecurityConfig { // extends WebSecurityConfigurerAdapter {
     @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    UserService userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -55,7 +53,6 @@ public class SecurityConfig { // extends WebSecurityConfigurerAdapter {
 
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
     }
 
@@ -90,10 +87,13 @@ public class SecurityConfig { // extends WebSecurityConfigurerAdapter {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                                .requestMatchers("/api/auth/signout").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .anyRequest().authenticated()
                 );

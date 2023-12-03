@@ -8,7 +8,7 @@ import java.util.List;
 public class UserMapper {
 
     public static UserDTO toDTO(SystemUser user){
-        return new UserDTO(user.getUserId().toString(),user.getUsername(), user.getEmail(), user.getRole().getName());
+        return new UserDTO(user.getUserId().toString(),user.getUsername(), user.getEmail(), user.getRole().getName(),user.isActive());
     }
 
 

@@ -11,11 +11,13 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import com.mundoasorrir.mundoasorrirbackend.Services.VacationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +38,8 @@ public class VacationController {
     private final VacationService vacationService;
     private final EventService eventService;
 
-    private final UserDetailsServiceImpl userService;
+    private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(VacationController.class);
 
     @Autowired
     JwtUtils jwtUtils;
@@ -70,9 +73,13 @@ public class VacationController {
     public ResponseEntity<?> rejectRequest(@RequestParam("requestId")Long  requestId){
         try{
             this.vacationService.rejectVacation(requestId);
+            logger.info("Vacation request rejected.");
+
             return ResponseEntity.ok(new MessageResponse("Vacation request rejected successfully!"));
 
         }catch(Exception e){
+            logger.info("Error rejecting vacation request.");
+
             return ResponseEntity.badRequest().body(new MessageResponse("There was an error in rejecting the request"));
         }
     }
@@ -93,6 +100,7 @@ public class VacationController {
                 if(BaseEventType.VACATION.equals(eventTypesSaved.get(i))){
                     markedVacation.setEventType(eventTypesSaved.get(i));
                     eventService.save(markedVacation);
+                    logger.info("Vacation request accepted;");
                     return ResponseEntity.ok(new MessageResponse("Vacation request accepted successfully!"));
 
                 }
@@ -104,6 +112,7 @@ public class VacationController {
 
 
 
+            logger.info("Vacation request accepted;");
 
             return ResponseEntity.ok(new MessageResponse("Vacation request accepted successfully!"));
 

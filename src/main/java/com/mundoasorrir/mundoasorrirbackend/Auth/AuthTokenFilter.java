@@ -2,12 +2,11 @@ package com.mundoasorrir.mundoasorrirbackend.Auth;
 
 import java.io.IOException;
 
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.mundoasorrir.mundoasorrirbackend.Auth.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UserService userDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 

@@ -71,7 +71,12 @@ public class UserGroup {
         return false;
     }
 
-    public Long getGroupId() {
+    public boolean isUserCreator(SystemUser user){
+        return this.createdBy.equals(user);
+    }
+
+
+        public Long getGroupId() {
         return groupId;
     }
 

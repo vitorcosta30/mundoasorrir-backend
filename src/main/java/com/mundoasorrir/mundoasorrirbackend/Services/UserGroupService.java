@@ -42,8 +42,18 @@ public class UserGroupService {
         group.removeUser(user);
         return save(group);
     }
+    public UserGroup addUser(SystemUser user, Long groupId){
+        UserGroup group = getByGroupId(groupId);
+        group.addUser(user);
+        return save(group);
+    }
 
     public Boolean isUserCreator(SystemUser user, Long groupId){
+        return findByGroupId(groupId).isUserCreator(user);
+    }
+
+    public Boolean isUserInGroup(SystemUser user, Long groupId){
         return findByGroupId(groupId).isUserInGroup(user);
     }
+
 }

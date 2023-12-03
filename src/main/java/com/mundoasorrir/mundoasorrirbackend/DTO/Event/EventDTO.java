@@ -1,7 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.DTO.Event;
 
 public class EventDTO {
-    private String eventId;
+    private String id;
 
     private String start;
 
@@ -13,14 +13,14 @@ public class EventDTO {
 
     private String type;
 
-    public EventDTO(String eventId, String startDate, String endDate) {
-        this.eventId = eventId;
+    public EventDTO(String id, String startDate, String endDate) {
+        this.id = id;
         this.start = startDate;
         this.end = endDate;
     }
 
-    public EventDTO(String eventId, String startDate, String endDate, String description, String place, String type) {
-        this.eventId = eventId;
+    public EventDTO(String id, String startDate, String endDate, String description, String place, String type) {
+        this.id = id;
         this.start = startDate;
         this.end = endDate;
         this.description = description;
@@ -28,12 +28,12 @@ public class EventDTO {
         this.type = type;
     }
 
-    public String getEventId() {
-        return eventId;
+    public String getId() {
+        return id;
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
+    public void setId(String eventId) {
+        this.id = eventId;
     }
 
     public String getStart() {

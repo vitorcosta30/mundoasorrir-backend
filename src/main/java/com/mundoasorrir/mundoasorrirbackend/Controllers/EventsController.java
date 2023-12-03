@@ -10,17 +10,11 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
-import com.mundoasorrir.mundoasorrirbackend.Message.ResponseFile;
-import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
-import com.mundoasorrir.mundoasorrirbackend.Repositories.EventRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
-import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsServiceImpl;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
@@ -58,7 +50,7 @@ public class EventsController {
     @Autowired
     EventTypeRepository eventTypeRepository;
 
-    private final UserDetailsServiceImpl userService;
+    private final UserService userService;
 
     private final UserGroupService userGroupService;
     @GetMapping("/getEvents")
@@ -83,16 +75,24 @@ public class EventsController {
 
 
     @PostMapping("/createEvent")
-    public ResponseEntity<?> createEvent(@RequestParam("description") String description,@RequestParam("place") String place,@RequestParam("eventType") String eventType,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate,HttpServletRequest request, @RequestParam("users") List<String> users,@RequestParam("groups") List<String> groups) {
-        List<Long> groupsConverted = new ArrayList<>();
-        for(int i = 0 ; i < groups.size(); i++){
-            groupsConverted.add(Long.valueOf(groups.get(i)));
+    public ResponseEntity<?> createEvent(@RequestParam("description") String description,@RequestParam("place") String place,@RequestParam("eventType") String eventType,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate,HttpServletRequest request, @RequestParam(name = "users", required = false) List<String> users,@RequestParam(name = "groups", required = false) List<String> groups) {
+        List<SystemUser> usersEnrolled = new ArrayList<>();
+        if(groups != null){
+            List<Long> groupsConverted = new ArrayList<>();
+            for(int i = 0 ; i < groups.size(); i++){
+                groupsConverted.add(Long.valueOf(groups.get(i)));
+            }
+            usersEnrolled.addAll(this.getUsersFromGroup(groupsConverted));
+        }
+        if(users != null){
+            usersEnrolled.addAll(this.getUsersFromUsername(users));
         }
 
+
+
+
         String message = "";
-        List<SystemUser> usersEnrolled = new ArrayList<>();
-        usersEnrolled.addAll(this.getUsersFromGroup(groupsConverted));
-        usersEnrolled.addAll(this.getUsersFromUsername(users));
+
         Date startDateOb;
         Date endDateOb;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
