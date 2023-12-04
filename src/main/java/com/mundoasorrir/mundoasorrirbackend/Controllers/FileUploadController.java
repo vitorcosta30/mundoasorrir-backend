@@ -1,6 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
+import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileDTO;
+import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
@@ -87,23 +89,11 @@ public class FileUploadController {
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<ResponseFile>> getListFiles(HttpServletRequest request) {
+    public ResponseEntity<List<FileDTO>> getListFiles(HttpServletRequest request) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
 
 
-        List<ResponseFile> files = fileUploadService.getAllFiles(username).map(dbFile -> {
-            String fileDownloadUri = ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/api/files/files/")
-                    .path(dbFile.getId().toString())
-                    .toUriString();
-
-            return new ResponseFile(
-                    dbFile.getName(),
-                    fileDownloadUri,
-                    dbFile.getType(),
-                    dbFile.getData().length);
-        }).collect(Collectors.toList());
+        List<FileDTO> files = FileMapper.toDTO(fileUploadService.getAllFiles(username).toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(files);
     }
