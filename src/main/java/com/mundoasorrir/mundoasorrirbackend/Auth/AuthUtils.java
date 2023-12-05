@@ -14,10 +14,18 @@ public class AuthUtils {
     @Autowired
     private UserService userService;
 
-    public Boolean permissionCheck(int permissionSet, HttpServletRequest request){
-        return PermissionManager.isAllowed(getUserFromRequest(request),permissionSet);
-    }
+    @Autowired
+    private PermissionManager permissionManager;
 
+    public Boolean lowPermissions(HttpServletRequest request){
+        return permissionManager.isAllowed(getUserFromRequest(request),this.permissionManager.hasLowPermissions());
+    }
+    public Boolean mediumPermissions(HttpServletRequest request){
+        return permissionManager.isAllowed(getUserFromRequest(request),this.permissionManager.hasMediumPermissions());
+    }
+    public Boolean highPermissions(HttpServletRequest request){
+        return permissionManager.isAllowed(getUserFromRequest(request),this.permissionManager.hasHighPermissions());
+    }
     public SystemUser getUserFromRequest(HttpServletRequest request){
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         return this.userService.findUserByUsername(username);

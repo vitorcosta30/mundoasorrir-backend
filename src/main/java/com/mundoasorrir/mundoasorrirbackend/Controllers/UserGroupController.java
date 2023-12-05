@@ -34,8 +34,12 @@ public class UserGroupController {
     @Autowired
     JwtUtils jwtUtils;
     @PostMapping("/createGroup")
-    public ResponseEntity<?> createGroup(@RequestParam("groupName") String groupName, @RequestParam("groupDesignation") String groupDesignation, HttpServletRequest request, @RequestParam("users") List<String> users) {
-        List<SystemUser> usersInGroup = new ArrayList<>(this.getUsersFromUsername(users));
+    public ResponseEntity<?> createGroup(@RequestParam("groupName") String groupName, @RequestParam("groupDesignation") String groupDesignation, HttpServletRequest request, @RequestParam(value = "users", required = false) List<String> users) {
+        List<SystemUser> usersInGroup = new ArrayList<>();
+        if(users != null){
+            usersInGroup.addAll(this.getUsersFromUsername(users));
+        }
+
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         usersInGroup.add(this.userService.findUserByUsername(username));
 

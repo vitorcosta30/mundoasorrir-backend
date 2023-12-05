@@ -4,9 +4,10 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+@Component
 public class PermissionManager {
 
     private static final Role DIRECTOR = BaseRoles.DIRECTOR;
@@ -20,35 +21,50 @@ public class PermissionManager {
     private static final Role[] ROLESET2 = new Role[]{DIRECTOR,MANAGER};
     private static final Role[] ROLESET3 = new Role[]{DIRECTOR};
 
-    public static boolean isAllowed(SystemUser user, int permissionSet){
+    private final int LOW_PERMISSIONS = 1;
+    private final int MEDIUM_PERMISSIONS = 2;
+    private final int HIGH_PERMISSIONS = 3;
+
+    public boolean isAllowed(SystemUser user, int permissionSet){
         Role userRole = user.getRole();
-        if(permissionSet == 1){
+        if(permissionSet == LOW_PERMISSIONS){
             return lowPermissions(userRole);
 
         }
-        if(permissionSet == 2){
+        if(permissionSet == MEDIUM_PERMISSIONS){
             return mediumPermissions(userRole);
 
         }
-        if(permissionSet == 3){
+        if(permissionSet == HIGH_PERMISSIONS){
             return highPermissions(userRole);
         }
         return false;
     }
-    private static boolean lowPermissions(Role role){
+    private boolean lowPermissions(Role role){
         return checkIfRoleIsIn(role,ROLESET1);
 
     }
 
-    private static boolean mediumPermissions(Role role){
+    public int hasLowPermissions(){
+        return this.LOW_PERMISSIONS;
+    }
+    public int hasMediumPermissions(){
+        return this.LOW_PERMISSIONS;
+    }
+    public int hasHighPermissions(){
+        return this.LOW_PERMISSIONS;
+    }
+
+
+    private boolean mediumPermissions(Role role){
         return checkIfRoleIsIn(role,ROLESET2);
 
     }
-    private static boolean highPermissions(Role role){
+    private  boolean highPermissions(Role role){
         return checkIfRoleIsIn(role,ROLESET3);
     }
 
-    private static boolean checkIfRoleIsIn(Role role, Role[] rolesAccepted){
+    private boolean checkIfRoleIsIn(Role role, Role[] rolesAccepted){
         for(int i = 0; i < rolesAccepted.length; i++){
             if(rolesAccepted[i].getName().equals(role.getName())){
                 return true;

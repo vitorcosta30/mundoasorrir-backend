@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -22,7 +23,7 @@ public class SystemUser {
 
     @Getter
     private String password;
-
+    @Getter
     @ManyToOne(cascade = CascadeType.ALL)
     private Role systemRole;
 
@@ -30,11 +31,16 @@ public class SystemUser {
     @Column(nullable = false)
     private boolean isActive;
 
+    @Getter
+    @ManyToOne(optional = true)
+    private Project currentProject;
+
     public SystemUser(String username,String email, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.isActive = true;
+        this.currentProject = null;
     }
 
     public SystemUser() {
@@ -91,5 +97,13 @@ public class SystemUser {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void setSystemRole(Role systemRole) {
+        this.systemRole = systemRole;
+    }
+
+    public void setCurrentProject(Project currentProject) {
+        this.currentProject = currentProject;
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.SignupRequest;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
@@ -15,6 +16,7 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.UserInfoResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangePasswordDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
+import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
@@ -54,7 +56,8 @@ public class AuthController {
     AuthenticationManager authenticationManager;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-
+    @Autowired
+    private AuthUtils authUtils;
 
     @Autowired
     UserService userService;
@@ -87,6 +90,7 @@ public class AuthController {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
+        logger.info("User "+ userDetails.getUsername() +  " logged in!");
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(new UserInfoResponse(userDetails.getId(),
@@ -102,17 +106,8 @@ public class AuthController {
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(HttpServletRequest request) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-        SystemUser usr = userService.findUserByUsername(username);
-        List<String> roles = usr.getSystemRole().stream()
-                .map(item -> item.getName())
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(new UserInfoResponse(usr.getUserId(),
-                usr.getUsername(),
-                usr.getEmail(),
-                roles));
-
-
-
+        UserDTO usr = UserMapper.toDTO(userService.findUserByUsername(username));
+        return ResponseEntity.status(HttpStatus.OK).body(usr);
     }
 
     @PostMapping("/signup")
@@ -125,43 +120,27 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        // Create new user's account
         SystemUser systemUser = new SystemUser(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
+        if(this.userService.save(systemUser, signUpRequest.getRole()) != null){
+            logger.info("User " + systemUser.getUsername() + " was created!");
+            return ResponseEntity.ok().body(new MessageResponse("User created successfully!!"));
 
-        String strRoles = signUpRequest.getRole();
-        Role[] roles = BaseRoles.systemRoles();
-        List<Role> rolesSaved = roleRepository.findAll();
-        if(strRoles == null ){
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Role is null!"));
-        }
-        for(int i = 0 ; i < roles.length ; i++){
-            if( strRoles.equals(roles[i].getName())){
-                logger.warn(strRoles + " - " +roles[i].getName());
+        }else{
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Role does not exist!!"));
 
-                    for(int x = 0 ; x < rolesSaved.size();x++){
-                        if(rolesSaved.get(x).getName().equals(roles[i].getName())){
-                            logger.warn(roles[i].getName() + " - " +rolesSaved.get(x));
-
-                            systemUser.setRoles(rolesSaved.get(x));
-                            userService.save(systemUser);
-                            return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-                        }
-                    }
-                systemUser.setRoles(roles[i]);
-                roleRepository.save(roles[i]);
-                userService.save(systemUser);
-                return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-            }
         }
 
 
-        return ResponseEntity.badRequest().body(new MessageResponse("Error: Role does not exist!!"));
     }
 
     @PatchMapping("/changePassword/{username}")
-    public ResponseEntity<?> changePassoword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword){
+    public ResponseEntity<?> changePassoword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword, HttpServletRequest request){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.badRequest().body(new MessageResponse("No permission for this funcionality!!"));
+
+        }
         if(!username.equals(newPassword.getUsername())){
             return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
         }
@@ -178,7 +157,12 @@ public class AuthController {
 
     }
     @PutMapping(value = "/updateUser/{idUser}")
-    public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser  ){
+    public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser  , HttpServletRequest request){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.badRequest().body(new MessageResponse("No permission for this funcionality!!"));
+
+        }
+
         if(!idUser.toString().equals(updatedUser.getId())){
             return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
         }

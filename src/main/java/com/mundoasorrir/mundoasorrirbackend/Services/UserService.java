@@ -1,6 +1,12 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
+import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
+import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
+import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
+import com.mundoasorrir.mundoasorrirbackend.Repositories.ProjectRepository;
+import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
@@ -15,6 +21,15 @@ import java.util.List;
 public class UserService implements UserDetailsService{
     @Autowired
     UserRepository userRepository;
+
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    ProjectService projectService;
 
     @Override
     @Transactional
@@ -33,6 +48,32 @@ public class UserService implements UserDetailsService{
 
         return   userRepository.findAll();
     }
+    public SystemUser save(SystemUser user, String role){
+        String strRoles = role;
+        Role[] roles = BaseRoles.systemRoles();
+        List<Role> rolesSaved = roleRepository.findAll();
+        if(strRoles == null ){
+            return null;
+        }
+        for(int i = 0 ; i < roles.length ; i++){
+            if( strRoles.equals(roles[i].getName())){
+
+                for(int x = 0 ; x < rolesSaved.size();x++){
+                    if(rolesSaved.get(x).getName().equals(roles[i].getName())){
+
+                        user.setRoles(rolesSaved.get(x));
+                        return this.save(user);
+                    }
+                }
+                user.setRoles(roles[i]);
+                roleRepository.save(roles[i]);
+
+                return this.save(user);
+            }
+        }
+        return this.save(user);
+    }
+
     public SystemUser save(SystemUser user){
         return this.userRepository.save(user);
     }
@@ -69,11 +110,13 @@ public class UserService implements UserDetailsService{
     }
 
     public SystemUser updateUser(Long id, UserDTO updatedData){
-
         SystemUser user = this.userRepository.getReferenceById(id);
         user.setEmail(updatedData.getEmail());
         user.setUsername(updatedData.getUsername());
-        return this.save(user);
+        if(user.getCurrentProject() == null || user.getCurrentProject().getId() != updatedData.getCurrentProject().getId()){
+            user.setCurrentProject(this.projectRepository.findProjectById(updatedData.getCurrentProject().getId()));
+        }
+        return this.save(user, updatedData.getRole());
 
     }
 

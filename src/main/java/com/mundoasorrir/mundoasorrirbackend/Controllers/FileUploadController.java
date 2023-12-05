@@ -3,10 +3,11 @@ package com.mundoasorrir.mundoasorrirbackend.Controllers;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
 import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileMapper;
+import com.mundoasorrir.mundoasorrirbackend.DTO.UploadInfo.UploadInfoDTO;
+import com.mundoasorrir.mundoasorrirbackend.DTO.UploadInfo.UploadInfoMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
-import com.mundoasorrir.mundoasorrirbackend.Message.ResponseFile;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.FileUploadService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
@@ -15,16 +16,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
@@ -37,6 +39,9 @@ public class FileUploadController {
     private final FileUploadService fileUploadService;
 
     private final UserService userService;
+    @Autowired
+    private Environment env;
+
 
     private final UserGroupService userGroupService;
     @Autowired
@@ -44,23 +49,30 @@ public class FileUploadController {
 
     @PostMapping("/upload")
     //@PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("users") List<String> users,@RequestParam("groups") List<String> groups, HttpServletRequest request) {
-        List<Long> groupsConverted = new ArrayList<>();
-        for(int i = 0 ; i < groups.size(); i++){
-            groupsConverted.add(Long.valueOf(groups.get(i)));
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam(value = "users", required = false) List<String> users,@RequestParam(value = "groups" , required = false) List<String> groups, HttpServletRequest request) {
+
+
+        List<SystemUser> usersAllowed = new ArrayList<>();
+        if (groups != null) {
+            List<Long> groupsConverted = new ArrayList<>();
+            for(int i = 0 ; i < groups.size(); i++){
+                groupsConverted.add(Long.valueOf(groups.get(i)));
+            }
+            usersAllowed.addAll(this.getUsersFromGroup(groupsConverted));
+        }
+        if(users != null){
+            usersAllowed.addAll(this.getUsersFromUsername(users));
         }
 
+
+
         String message = "";
-        List<SystemUser> usersAllowed = new ArrayList<>();
-        usersAllowed.addAll(this.getUsersFromGroup(groupsConverted));
-        usersAllowed.addAll(this.getUsersFromUsername(users));
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         SystemUser user = this.userService.findUserByUsername(username);
 
 
         try {
             fileUploadService.store(file, usersAllowed, user);
-
             message = "Uploaded the file successfully: " + file.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
         } catch (Exception e) {
@@ -96,6 +108,19 @@ public class FileUploadController {
         List<FileDTO> files = FileMapper.toDTO(fileUploadService.getAllFiles(username).toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(files);
+    }
+
+    @GetMapping("/maxUploadSize")
+    public ResponseEntity<UploadInfoDTO> getMaxUploadSize() {
+        String maxSizeStrng = env.getProperty("spring.servlet.multipart.max-file-size");
+        UploadInfoDTO uploadInfo = UploadInfoMapper.toDTO(maxSizeStrng);
+        return ResponseEntity.status(HttpStatus.OK).body(uploadInfo);
+
+    }
+    @GetMapping("/maxUploadSizeString")
+    public ResponseEntity<String> getMaxUploadSizeString() {
+        return ResponseEntity.status(HttpStatus.OK).body(env.getProperty("spring.servlet.multipart.max-file-size"));
+
     }
 
     @GetMapping("/files/{id}")

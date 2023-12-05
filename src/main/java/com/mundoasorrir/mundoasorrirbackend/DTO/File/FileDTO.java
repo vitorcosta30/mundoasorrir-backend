@@ -49,4 +49,11 @@ public class FileDTO {
         this.size = size;
     }
 
+    public String getSharedBy() {
+        return sharedBy;
+    }
+
+    public void setSharedBy(String sharedBy) {
+        this.sharedBy = sharedBy;
+    }
 }

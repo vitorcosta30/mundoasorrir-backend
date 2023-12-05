@@ -21,7 +21,7 @@ public class FileMapper {
                 .fromCurrentContextPath()
                 .path("/api/files/files/")
                 .path(file.getId().toString())
-                .toUriString()
+                .toUriString();
         return new FileDTO(file.getName(),fileDownloadUri,file.getType(),file.getData().length,file.getSharedBy().getUsername());
     }
 }
