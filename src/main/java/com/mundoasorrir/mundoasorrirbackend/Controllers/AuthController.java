@@ -138,7 +138,7 @@ public class AuthController {
     @PatchMapping("/changePassword/{username}")
     public ResponseEntity<?> changePassoword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword, HttpServletRequest request){
         if(!this.authUtils.highPermissions(request)){
-            return ResponseEntity.badRequest().body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
 
         }
         if(!username.equals(newPassword.getUsername())){

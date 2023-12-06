@@ -1,5 +1,6 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
@@ -28,9 +29,15 @@ import java.util.List;
 public class UserController {
     @Autowired
     private final UserService userService;
+
+    @Autowired
+    private final AuthUtils authUtils;
     @GetMapping(value = "/getInfo/{username}")
-    public ResponseEntity<UserDTO> getUserInfo(@PathVariable String username) {
-        //log.info("File name: {}", file.getOriginalFilename());
+    public ResponseEntity<?> getUserInfo(@PathVariable String username, HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
+
         UserDTO user = UserMapper.toDTO(this.userService.findUserByUsername(username));
 
 
@@ -44,7 +51,10 @@ public class UserController {
 
 
     @GetMapping(value = "/getUsers")
-    public ResponseEntity<List<UserDTO>> getUsers() {
+    public ResponseEntity<?> getUsers(HttpServletRequest request) {
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         List<UserDTO> res = UserMapper.toDTO(userService.findAll());
         return ResponseEntity.ok().body(res);
     }
@@ -53,6 +63,9 @@ public class UserController {
 
     @RequestMapping(value = "/updateUser/{idUser}",method = {RequestMethod.OPTIONS,RequestMethod.PUT}, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser , HttpServletRequest request ){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         if(!idUser.toString().equals(updatedUser.getId())){
             return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
         }
@@ -81,7 +94,10 @@ public class UserController {
 
 
     @PostMapping(value="/deactivateAccount")
-    public ResponseEntity<?> deactivateAccount(@RequestParam("username") String username){
+    public ResponseEntity<?> deactivateAccount(@RequestParam("username") String username, HttpServletRequest request){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         try{
             this.userService.deactivateUser(username);
             return ResponseEntity.ok(new MessageResponse("Account deactivated successfully!"));
@@ -91,7 +107,10 @@ public class UserController {
     }
 
     @PostMapping(value="/activateAccount")
-    public ResponseEntity<?> activateAccount(@RequestParam("username") String username){
+    public ResponseEntity<?> activateAccount(@RequestParam("username") String username, HttpServletRequest request){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         try{
             this.userService.activateUser(username);
             return ResponseEntity.ok(new MessageResponse("Account activated successfully!"));

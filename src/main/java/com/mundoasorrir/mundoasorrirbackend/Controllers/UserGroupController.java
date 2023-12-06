@@ -1,6 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
+import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.UserGroup.UserGroupDTO;
@@ -30,11 +32,18 @@ public class UserGroupController {
 
     private final UserService userService;
 
+    @Autowired
+    private final AuthUtils authUtils;
+
     private final UserGroupService userGroupService;
     @Autowired
     JwtUtils jwtUtils;
     @PostMapping("/createGroup")
     public ResponseEntity<?> createGroup(@RequestParam("groupName") String groupName, @RequestParam("groupDesignation") String groupDesignation, HttpServletRequest request, @RequestParam(value = "users", required = false) List<String> users) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
+
         List<SystemUser> usersInGroup = new ArrayList<>();
         if(users != null){
             usersInGroup.addAll(this.getUsersFromUsername(users));
@@ -56,7 +65,10 @@ public class UserGroupController {
         }
     }
     @GetMapping("/getGroupsSimple")
-    public ResponseEntity<List<UserGroupDTO>> getGroups( HttpServletRequest request) {
+    public ResponseEntity<?> getGroups( HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         List<UserGroupDTO> res = UserGroupMapper.toDTO(userGroupService.findUserGroups(username));
         return ResponseEntity.ok().body(res);
@@ -65,6 +77,9 @@ public class UserGroupController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getGroup(@PathVariable Long id, HttpServletRequest request){
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         if(isUserInGroup(username,id)){
             return ResponseEntity.ok().body(UserGroupMapper.toDTO(this.userGroupService.getByGroupId(id)));
@@ -85,6 +100,9 @@ public class UserGroupController {
 
     @PostMapping("/leaveGroup")
     public ResponseEntity<?> leaveGroup(@RequestParam("groupId") Long groupId,HttpServletRequest request ){
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         SystemUser user = this.userService.findUserByUsername(username);
         try{
@@ -97,7 +115,10 @@ public class UserGroupController {
     }
 
     @PostMapping("/removeUser")
-    public ResponseEntity<?> removeUser(@RequestParam("groupId") Long groupId,@RequestParam("username")String username ){
+    public ResponseEntity<?> removeUser(@RequestParam("groupId") Long groupId,@RequestParam("username")String username,HttpServletRequest request ){
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         SystemUser user = this.userService.findUserByUsername(username);
         try{
             this.userGroupService.removeUser(user,groupId);
@@ -110,7 +131,10 @@ public class UserGroupController {
 
 
     @PostMapping("/addUser")
-    public ResponseEntity<?> addUser(@RequestParam("groupId") Long groupId,@RequestParam("username")String username ){
+    public ResponseEntity<?> addUser(@RequestParam("groupId") Long groupId,@RequestParam("username")String username, HttpServletRequest request ){
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         SystemUser user = this.userService.findUserByUsername(username);
         try{
             this.userGroupService.addUser(user,groupId);
@@ -122,8 +146,10 @@ public class UserGroupController {
     }
 
     @PostMapping("/getUsersInGroup")
-    public ResponseEntity<?> getUsersInGroup(@RequestParam("groupId") Long groupId ){
-
+    public ResponseEntity<?> getUsersInGroup(@RequestParam("groupId") Long groupId, HttpServletRequest request ){
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         try{
             return ResponseEntity.ok().body(UserMapper.toDTO(this.userGroupService.getUsersInGroup(groupId)));
 
@@ -133,7 +159,10 @@ public class UserGroupController {
     }
 
     @PostMapping("/getUsersNotInGroup")
-    public ResponseEntity<?> getUsersNotInGroup(@RequestParam("groupId") Long groupId ){
+    public ResponseEntity<?> getUsersNotInGroup(@RequestParam("groupId") Long groupId,HttpServletRequest request ){
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         List<SystemUser> users = this.userService.findAll();
         users.removeAll(this.userGroupService.getUsersInGroup(groupId));
 
@@ -148,7 +177,10 @@ public class UserGroupController {
 
 
     @GetMapping(value = "/getGroupMembers/{id}")
-    public ResponseEntity<List<UserDTO>> getGroupMembers(@PathVariable Long id) {
+    public ResponseEntity<?> getGroupMembers(@PathVariable Long id, HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         List<UserDTO> res = UserMapper.toDTO(userGroupService.findByGroupId(id).getGroupUsers());
         return ResponseEntity.ok().body(res);
     }

@@ -1,10 +1,13 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Project.ProjectMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.ProjectService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +25,14 @@ public class ProjectController {
     private ProjectService projectService;
     @Autowired
     JwtUtils jwtUtils;
-
+    @Autowired
+    private final AuthUtils authUtils;
 
     @PostMapping("/createProject")
-    public ResponseEntity<?> createProject(@RequestParam("designation") String designation, @RequestParam("location")String location){
+    public ResponseEntity<?> createProject(@RequestParam("designation") String designation, @RequestParam("location")String location, HttpServletRequest request){
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         try{
             this.projectService.save(new Project(designation,location));
             return ResponseEntity.ok().body(new MessageResponse("Project created successfully!!"));

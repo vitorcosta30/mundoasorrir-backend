@@ -1,6 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
+import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.File.FileMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.UploadInfo.UploadInfoDTO;
@@ -41,7 +43,8 @@ public class FileUploadController {
     private final UserService userService;
     @Autowired
     private Environment env;
-
+    @Autowired
+    private final AuthUtils authUtils;
 
     private final UserGroupService userGroupService;
     @Autowired
@@ -50,7 +53,9 @@ public class FileUploadController {
     @PostMapping("/upload")
     //@PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam(value = "users", required = false) List<String> users,@RequestParam(value = "groups" , required = false) List<String> groups, HttpServletRequest request) {
-
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
 
         List<SystemUser> usersAllowed = new ArrayList<>();
         if (groups != null) {
@@ -101,8 +106,12 @@ public class FileUploadController {
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<FileDTO>> getListFiles(HttpServletRequest request) {
+    public ResponseEntity<?> getListFiles(HttpServletRequest request) {
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+        }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+
 
 
         List<FileDTO> files = FileMapper.toDTO(fileUploadService.getAllFiles(username).toList());
