@@ -94,7 +94,6 @@ public class SecurityConfig { // extends WebSecurityConfigurerAdapter {
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                                 .requestMatchers("/api/auth/signout").permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 
