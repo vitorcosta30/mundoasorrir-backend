@@ -1,9 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Attendance;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import jakarta.persistence.*;
-import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +11,7 @@ import java.util.List;
 public class Attendance {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long attendanceEventId;
+    private Long attendanceId;
     @Column(unique = true)
     private Date dayAttendance;
 
@@ -82,12 +80,12 @@ public class Attendance {
         return usersUnmarked;
     }
 
-    public Long getAttendanceEventId() {
-        return attendanceEventId;
+    public Long getAttendanceId() {
+        return attendanceId;
     }
 
-    public void setAttendanceEventId(Long attendanceEventId) {
-        this.attendanceEventId = attendanceEventId;
+    public void setAttendanceId(Long attendanceEventId) {
+        this.attendanceId = attendanceEventId;
     }
 
     public Date getDayAttendance() {

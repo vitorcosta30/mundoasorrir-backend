@@ -1,13 +1,16 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Presence.PresenceMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.AttendanceService;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +33,16 @@ public class AttendanceController {
     private EventService eventService;
     @Autowired
     private AttendanceService attendanceService;
-
+    @Autowired
+    private final AuthUtils authUtils;
     @Autowired
 
     private final UserService userService;
     @GetMapping(value = "/getUsersBusyToday")
-    public ResponseEntity<List<UserDTO>> getBusyUsers() throws ParseException {
+    public ResponseEntity<?> getBusyUsers(HttpServletRequest request) throws ParseException {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date today = new Date();
         String todayDateString = dateFormat.format(today);
@@ -45,7 +52,11 @@ public class AttendanceController {
     }
 
     @PostMapping("/getUsersUnmarked")
-    public ResponseEntity<?> getUsersForDayAttendance(@RequestParam("obsDate")String date) {
+    public ResponseEntity<?> getUsersForDayAttendance(@RequestParam("obsDate")String date, HttpServletRequest request ) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
+
         Date obsDate ;
         try{
             obsDate = handleDate(date);
@@ -63,7 +74,10 @@ public class AttendanceController {
 
 
     @PostMapping("/getAttendanceSheet")
-    public ResponseEntity<?> getAttendanceSheet(@RequestParam("obsDate")String date) {
+    public ResponseEntity<?> getAttendanceSheet(@RequestParam("obsDate")String date, HttpServletRequest request ) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         Date obsDate ;
         try{
             obsDate = handleDate(date);
@@ -79,7 +93,10 @@ public class AttendanceController {
         return ResponseEntity.ok().body(PresenceMapper.toDTO(this.attendanceService.getPresencesInDay(obsDate)));
     }
     @PostMapping("/markPresent")
-    public ResponseEntity<?> markPresent(@RequestParam("username") String username, @RequestParam("obsDate")String date){
+    public ResponseEntity<?> markPresent(@RequestParam("username") String username, @RequestParam("obsDate")String date, HttpServletRequest request ){
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         Date obsDate ;
         try{
             obsDate = handleDate(date) ;
@@ -101,7 +118,10 @@ public class AttendanceController {
     }
 
     @PostMapping("/markAbsent")
-    public ResponseEntity<?> markAbsent(@RequestParam("username") String username, @RequestParam("obsDate")String date){
+    public ResponseEntity<?> markAbsent(@RequestParam("username") String username, @RequestParam("obsDate")String date,  HttpServletRequest request){
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         Date obsDate ;
         try{
             obsDate = handleDate(date) ;
@@ -122,8 +142,8 @@ public class AttendanceController {
     }
 
     private Date handleDate(String date) throws ParseException {
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        //String todayDateString = dateFormat.format(date);
         return dateFormat.parse(date);
     }
 }
