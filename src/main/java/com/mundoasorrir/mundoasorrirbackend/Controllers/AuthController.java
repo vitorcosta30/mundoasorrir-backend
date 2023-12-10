@@ -14,6 +14,7 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.UserInfoResponse;
+import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangeMyPasswordDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangePasswordDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
@@ -120,23 +121,16 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        SystemUser systemUser = new SystemUser(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
-        if(this.userService.save(systemUser, signUpRequest.getRole()) != null){
-            logger.info("User " + systemUser.getUsername() + " was created!");
+        if (this.userService.create(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getRole()) != null) {
+            logger.info("User " + signUpRequest.getUsername() + " was created!");
             return ResponseEntity.ok().body(new MessageResponse("User created successfully!!"));
-
-        }else{
+        } else {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Role does not exist!!"));
-
         }
-
-
     }
 
     @PatchMapping("/changePassword/{username}")
-    public ResponseEntity<?> changePassoword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword, HttpServletRequest request){
+    public ResponseEntity<?> changePassword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword, HttpServletRequest request){
         if(!this.authUtils.highPermissions(request)){
             return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
 
@@ -156,7 +150,35 @@ public class AuthController {
         }
 
     }
-    @PutMapping(value = "/updateUser/{idUser}")
+    @PatchMapping("/changeMyPassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangeMyPasswordDTO newPassword, HttpServletRequest request){
+        SystemUser user = this.authUtils.getUserFromRequest(request);
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
+
+        }
+        if(!this.encoder.matches(newPassword.getOldPassword(),user.getPassword())){
+            logger.info(newPassword.getOldPassword()+  "-"+ user.getPassword());
+
+            return ResponseEntity.status(403).body(new MessageResponse("Password is wrong!!"));
+        }
+        if(!newPassword.getReNewPassword().equals(newPassword.getNewPassword())){
+            return ResponseEntity.status(401).body(new MessageResponse("Passwords dont match!!"));
+        }
+        user.setPassword(this.encoder.encode(newPassword.getNewPassword()));
+        if(this.userService.save(user) != null){
+            return ResponseEntity.ok().body(new MessageResponse("Password updated successfully!!"));
+        }else{
+            return ResponseEntity.badRequest().body(new MessageResponse("There was an error!!"));
+
+        }
+
+    }
+
+
+
+
+        @PutMapping(value = "/updateUser/{idUser}")
     public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser  , HttpServletRequest request){
         if(!this.authUtils.highPermissions(request)){
             return ResponseEntity.badRequest().body(new MessageResponse("No permission for this funcionality!!"));
