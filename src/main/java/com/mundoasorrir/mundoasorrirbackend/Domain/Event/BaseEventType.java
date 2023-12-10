@@ -3,16 +3,16 @@ package com.mundoasorrir.mundoasorrirbackend.Domain.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 
 public class BaseEventType {
-    public static final EventType MISSION = EventType.valueOf("MISSION");
+    public static final EventType MISSION = EventType.valueOf("MISSÃO");
     /**
      * Colaborador
      */
-    public static final EventType MEETING = EventType.valueOf("MEETING");
+    public static final EventType MEETING = EventType.valueOf("REUNIÃO");
     /**
      * Diretor
      */
 
-    public static final EventType VACATION = EventType.valueOf("VACATION");
+    public static final EventType VACATION = EventType.valueOf("FÉRIAS");
 
 
 

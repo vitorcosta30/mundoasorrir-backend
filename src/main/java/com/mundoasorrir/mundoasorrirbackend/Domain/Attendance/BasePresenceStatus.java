@@ -7,17 +7,17 @@ public class BasePresenceStatus {
     /**
      * Coordenador
      */
-    public static final PresenceStatus PRESENT = PresenceStatus.valueOf("PRESENT");
+    public static final PresenceStatus PRESENT = PresenceStatus.valueOf("PRESENTE");
     /**
      * Colaborador
      */
-    public static final PresenceStatus ABSENT = PresenceStatus.valueOf("ABSENT");
+    public static final PresenceStatus ABSENT = PresenceStatus.valueOf("FALTOU");
     /**
      * Diretor
      */
 
 
-    public static final PresenceStatus UNMARKED = PresenceStatus.valueOf("UNMARKED");
+    public static final PresenceStatus UNMARKED = PresenceStatus.valueOf("POR MARCAR");
 
 
     public static final PresenceStatus LATE = PresenceStatus.valueOf("LATE");

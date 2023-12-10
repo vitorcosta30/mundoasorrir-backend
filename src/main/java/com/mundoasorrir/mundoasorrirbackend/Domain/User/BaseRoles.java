@@ -4,17 +4,17 @@ public final class BaseRoles {
     /**
      * Coordenador
      */
-    public static final Role MANAGER = Role.valueOf("MANAGER");
+    public static final Role MANAGER = Role.valueOf("COORDENADOR");
     /**
      * Colaborador
      */
-    public static final Role EMPLOYEE = Role.valueOf("EMPLOYEE");
+    public static final Role EMPLOYEE = Role.valueOf("COLABORADOR");
     /**
      * Diretor
      */
 
 
-    public static final Role DIRECTOR = Role.valueOf("DIRECTOR");
+    public static final Role DIRECTOR = Role.valueOf("DIRETOR");
 
 
     /**
