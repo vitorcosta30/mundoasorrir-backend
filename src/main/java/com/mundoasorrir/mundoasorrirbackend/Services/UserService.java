@@ -6,12 +6,14 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.ProjectRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,9 @@ import java.util.List;
 public class UserService implements UserDetailsService{
     @Autowired
     UserRepository userRepository;
-
+    @Lazy
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     RoleRepository roleRepository;
@@ -38,6 +42,12 @@ public class UserService implements UserDetailsService{
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return UserDetailsImpl.build(systemUser);
+    }
+
+
+
+    public SystemUser create(String username,String email, String password, String role){
+        return this.save(new SystemUser(username,email,encoder.encode(password)), role);
     }
 
     public SystemUser findUserByUsername(String username) throws UsernameNotFoundException {

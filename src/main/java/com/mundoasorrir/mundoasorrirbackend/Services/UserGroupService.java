@@ -22,6 +22,9 @@ public class UserGroupService {
     public UserGroup getByGroupId(Long groupId){
         return this.userGroupRepository.getUserGroupByGroupIdEquals(groupId);
     }
+    public Boolean existsByGroupName(String groupName){
+        return this.userGroupRepository.existsByGroupName(groupName);
+    }
 
 
     public UserGroup save(UserGroup userGroup){
