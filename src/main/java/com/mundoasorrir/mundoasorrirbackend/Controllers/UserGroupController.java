@@ -43,17 +43,23 @@ public class UserGroupController {
         if(!this.authUtils.mediumPermissions(request)){
             return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
         }
+        if (userGroupService.existsByGroupName(groupName)) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Groupname is already taken!"));
+        }
+
 
         List<SystemUser> usersInGroup = new ArrayList<>();
         if(users != null){
             usersInGroup.addAll(this.getUsersFromUsername(users));
         }
 
+
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         usersInGroup.add(this.userService.findUserByUsername(username));
 
-        UserGroup userGroup = new UserGroup(groupName,this.userService.findUserByUsername(username),groupDesignation,usersInGroup);
         String message = "";
+        usersInGroup = usersInGroup.stream().distinct().toList();
+        UserGroup userGroup = new UserGroup(groupName,this.userService.findUserByUsername(username),groupDesignation,usersInGroup);
 
         try {
             userGroupService.save(userGroup);

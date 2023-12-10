@@ -1,5 +1,6 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
+import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Event.EventDTO;
@@ -12,6 +13,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
+import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
@@ -49,6 +51,8 @@ public class EventsController {
 
     @Autowired
     EventTypeRepository eventTypeRepository;
+    @Autowired
+    private final AuthUtils authUtils;
 
     private final UserService userService;
 
@@ -65,7 +69,10 @@ public class EventsController {
     }
 
     @GetMapping("/getUserEvents/{username}")
-    public ResponseEntity<List<EventDTO>> getUserEvents(@PathVariable String username) {
+    public ResponseEntity<?> getUserEvents(@PathVariable String username,HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         List<EventDTO> userEvents = EventMapper.toDTO(eventService.getAllEventsFromUsername(username).toList());
         logger.info("Events fetched for user "+username);
         return ResponseEntity.status(HttpStatus.OK).body(userEvents);
@@ -76,6 +83,9 @@ public class EventsController {
 
     @PostMapping("/createEvent")
     public ResponseEntity<?> createEvent(@RequestParam("description") String description,@RequestParam("place") String place,@RequestParam("eventType") String eventType,@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate,HttpServletRequest request, @RequestParam(name = "users", required = false) List<String> users,@RequestParam(name = "groups", required = false) List<String> groups) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         List<SystemUser> usersEnrolled = new ArrayList<>();
         if(groups != null){
             List<Long> groupsConverted = new ArrayList<>();
@@ -87,6 +97,7 @@ public class EventsController {
         if(users != null){
             usersEnrolled.addAll(this.getUsersFromUsername(users));
         }
+        usersEnrolled = usersEnrolled.stream().distinct().toList();
 
 
 
@@ -147,13 +158,19 @@ public class EventsController {
     }
 
     @GetMapping(value = "/getEvent/{id}")
-    public ResponseEntity<EventDTO> getEvent(@PathVariable Long id) {
+    public ResponseEntity<?> getEvent(@PathVariable Long id,HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         EventDTO res = EventMapper.toDTO(eventService.getEventFromId(id));
         return ResponseEntity.ok().body(res);
     }
 
     @GetMapping(value = "/getEventMembers/{id}")
-    public ResponseEntity<List<UserDTO>> getEventMembers(@PathVariable Long id) {
+    public ResponseEntity<?> getEventMembers(@PathVariable Long id, HttpServletRequest request) {
+        if(!this.authUtils.lowPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
         List<UserDTO> res = UserMapper.toDTO(eventService.getEventFromId(id).getEnrolledUsers());
         return ResponseEntity.ok().body(res);
     }

@@ -68,6 +68,7 @@ public class FileUploadController {
         if(users != null){
             usersAllowed.addAll(this.getUsersFromUsername(users));
         }
+        usersAllowed = usersAllowed.stream().distinct().toList();
 
 
 
