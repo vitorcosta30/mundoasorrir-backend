@@ -1,5 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 import jakarta.persistence.*;
+
+import java.util.List;
+
 @Entity
 @Table(name = "system_role")
 public class Role {
@@ -10,6 +13,9 @@ public class Role {
 
     @Column(length = 20, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "systemRole", cascade = CascadeType.ALL)
+    private List<SystemUser> users;
 
     public Role() {
 

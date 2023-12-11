@@ -15,7 +15,7 @@ public class Attendance {
     @Column(unique = true)
     private Date dayAttendance;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendance")
     private List<Present> userAttendance;
 
 

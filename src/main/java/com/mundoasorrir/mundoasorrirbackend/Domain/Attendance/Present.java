@@ -9,9 +9,12 @@ import org.springframework.data.util.Pair;
 public class Present {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long attendanceEventId;
-    @ManyToOne
+    private Long presenceId;
+    @ManyToOne( cascade =CascadeType.ALL)
     private SystemUser user;
+
+    @ManyToOne(cascade =CascadeType.ALL)
+    private Attendance attendance;
 
     @Embedded
     private PresenceStatus presenceStatus;
@@ -34,13 +37,13 @@ public class Present {
         this.presenceStatus = new PresenceStatus();
     }
 
-    public Long getAttendanceEventId() {
+    public Long getPresenceId() {
 
-        return attendanceEventId;
+        return presenceId;
     }
 
-    public void setAttendanceEventId(Long attendanceEventId) {
-        this.attendanceEventId = attendanceEventId;
+    public void setPresenceId(Long attendanceEventId) {
+        this.presenceId = attendanceEventId;
     }
 
     public SystemUser getUser() {
@@ -67,5 +70,13 @@ public class Present {
 
     public void setPresenceStatus(PresenceStatus presenceStatus) {
         this.presenceStatus = presenceStatus;
+    }
+
+    public Attendance getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(Attendance attendance) {
+        this.attendance = attendance;
     }
 }

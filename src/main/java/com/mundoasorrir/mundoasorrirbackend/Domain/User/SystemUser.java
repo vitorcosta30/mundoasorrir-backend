@@ -1,7 +1,11 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
+import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
+import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -24,7 +28,7 @@ public class SystemUser {
     @Getter
     private String password;
     @Getter
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     private Role systemRole;
 
     @Getter
@@ -34,6 +38,29 @@ public class SystemUser {
     @Getter
     @ManyToOne(optional = true)
     private Project currentProject;
+
+
+    @ManyToMany(mappedBy = "enrolledUsers")
+    private List<Event> event;
+
+    @ManyToMany(mappedBy = "usersAllowed")
+    private List<File> file;
+    @OneToMany(mappedBy = "sharedBy")
+    private List<File> sharedFiles;
+
+
+    @ManyToMany(mappedBy = "groupUsers")
+    private List<UserGroup> userGroup;
+    @OneToMany(mappedBy = "createdBy")
+    private List<UserGroup> createdGroups;
+
+    @OneToMany(mappedBy = "user")
+    private List<Vacation> vacation;
+
+
+    @OneToMany(mappedBy = "user")
+    private List<Present> presence;
+
 
     public SystemUser(String username,String email, String password) {
         this.email = email;

@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService{
     }
 
 
-
+    @Transactional
     public SystemUser create(String username,String email, String password, String role){
         return this.save(new SystemUser(username,email,encoder.encode(password)), role);
     }
@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService{
 
         return   userRepository.findAll();
     }
+    @Transactional
     public SystemUser save(SystemUser user, String role){
         String strRoles = role;
         Role[] roles = BaseRoles.systemRoles();
@@ -86,6 +87,12 @@ public class UserService implements UserDetailsService{
 
     public SystemUser save(SystemUser user){
         return this.userRepository.save(user);
+    }
+    @Transactional
+    public void delete(SystemUser user){
+        if(existsByUsername(user.getUsername())) {
+            this.userRepository.delete(findUserByUsername(user.getUsername()));
+        }
     }
 
     public Boolean existsByUsername(String username){
