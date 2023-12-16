@@ -25,7 +25,7 @@ public class AttendanceService {
 
     public Attendance save(Date date, List<SystemUser> users){
         Attendance attendance = new Attendance(date,users);
-        savePresences(attendance.getUserAttendance());
+        //savePresences(attendance.getUserAttendance());
         return this.attendanceRepository.save(attendance);
     }
     private void savePresences(List<Present> presences){

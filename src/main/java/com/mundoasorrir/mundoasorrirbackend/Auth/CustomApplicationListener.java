@@ -26,21 +26,16 @@ public class CustomApplicationListener implements ApplicationListener<Applicatio
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         if(env.containsProperty(bootstrap) && env.getProperty(bootstrap).equals("true")){
-            System.out.println("1");
 
             if(this.userDetailsService.existsByUsername(this.firstUser.getUsername())){
-                System.out.println("2");
 
             }else{
-                System.out.println("3");
 
                 this.userDetailsService.create(this.firstUser.getUsername(),this.firstUser.getEmail(),this.firstUser.getPassword(), BaseRoles.DIRECTOR.getName());
             }
         }else{
-            System.out.println("4");
 
             if(this.userDetailsService.existsByUsername(this.firstUser.getUsername())){
-                System.out.println("5");
                 if(this.userDetailsService.isUserActiveUsername(this.firstUser.getUsername())){
                     this.userDetailsService.deactivateUser(this.firstUser.getUsername());
                 }
@@ -48,8 +43,6 @@ public class CustomApplicationListener implements ApplicationListener<Applicatio
 
             }
         }
-        System.out.println("6");
-        // run your code
     }
 
 }

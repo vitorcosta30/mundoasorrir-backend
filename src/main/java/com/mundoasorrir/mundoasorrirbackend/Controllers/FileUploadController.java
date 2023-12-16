@@ -27,6 +27,7 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class FileUploadController {
 
     @PostMapping("/upload")
     //@PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam(value = "users", required = false) List<String> users,@RequestParam(value = "groups" , required = false) List<String> groups, HttpServletRequest request) {
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam(value = "users", required = false) List<String> users,@RequestParam(value = "groups" , required = false) List<String> groups, HttpServletRequest request) throws IOException {
         if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
         }
@@ -69,6 +70,7 @@ public class FileUploadController {
             usersAllowed.addAll(this.getUsersFromUsername(users));
         }
         usersAllowed = usersAllowed.stream().distinct().toList();
+        List<SystemUser> usersAlowedMut = new ArrayList<>(usersAllowed);
 
 
 
@@ -78,9 +80,10 @@ public class FileUploadController {
 
 
         try {
-            fileUploadService.store(file, usersAllowed, user);
+            fileUploadService.store(file, usersAlowedMut, user);
             message = "Uploaded the file successfully: " + file.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+
         } catch (Exception e) {
             message = "Could not upload the file: " + file.getOriginalFilename() + "!";
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));

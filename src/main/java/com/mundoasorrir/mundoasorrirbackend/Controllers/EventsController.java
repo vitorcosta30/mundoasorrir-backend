@@ -97,6 +97,7 @@ public class EventsController {
         if(users != null){
             usersEnrolled.addAll(this.getUsersFromUsername(users));
         }
+        usersEnrolled.add(this.authUtils.getUserFromRequest(request));
         usersEnrolled = usersEnrolled.stream().distinct().toList();
 
 

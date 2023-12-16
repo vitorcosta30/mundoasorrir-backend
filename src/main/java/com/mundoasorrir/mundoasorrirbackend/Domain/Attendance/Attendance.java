@@ -65,7 +65,7 @@ public class Attendance {
     private List<Present> intantiatePresenceList(List<SystemUser> users){
         List<Present> userAttedance = new ArrayList<>();
         for(int i = 0 ; i < users.size();i++){
-            userAttedance.add(new Present(users.get(i)));
+            userAttedance.add(new Present(users.get(i),this));
         }
         return userAttedance;
     }

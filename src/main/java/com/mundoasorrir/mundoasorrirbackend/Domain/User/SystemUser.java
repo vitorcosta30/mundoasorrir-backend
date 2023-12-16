@@ -9,9 +9,10 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+
 @Entity
 @Table(name = "sys_user")
 public class SystemUser {
@@ -83,6 +84,19 @@ public class SystemUser {
         if(!this.isActive) {
             this.isActive = true;
         }
+    }
+
+    public List<Present> getPresencesInMonth(int month, int year){
+        List<Present> res = new ArrayList<>();
+        for(int i = 0 ; i < this.presence.size(); i++){
+            LocalDate localDate = this.presence.get(i).getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if(localDate.getMonthValue() == month && localDate.getYear() == year){
+                res.add(this.presence.get(i));
+
+            }
+        }
+        return res;
     }
 
 

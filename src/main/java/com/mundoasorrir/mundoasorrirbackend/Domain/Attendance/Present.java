@@ -32,9 +32,10 @@ public class Present {
         this.presenceStatus = presenceStatus;
     }
 
-    public Present(SystemUser user) {
+    public Present(SystemUser user,Attendance attendance) {
         this.user = user;
         this.presenceStatus = new PresenceStatus();
+        this.attendance = attendance;
     }
 
     public Long getPresenceId() {

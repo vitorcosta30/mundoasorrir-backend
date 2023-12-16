@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
@@ -42,6 +43,10 @@ public class UserService implements UserDetailsService{
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return UserDetailsImpl.build(systemUser);
+    }
+
+    public List<Present> getPresencesInMonth(String username, int month, int year){
+        return this.findUserByUsername(username).getPresencesInMonth(month, year);
     }
 
 
