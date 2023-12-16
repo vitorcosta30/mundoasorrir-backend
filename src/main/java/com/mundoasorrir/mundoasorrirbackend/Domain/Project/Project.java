@@ -1,21 +1,40 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Project;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
+import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Project {
 
+    @Setter
+    @Getter
     @Id
     @GeneratedValue
     private Long id;
 
 
+    @Getter
+    @Setter
     private String designation;
 
+    @Setter
+    @Getter
     private String location;
 
+    @Getter
+    @Column(nullable = false)
+    private boolean isActive;
+
+    @OneToMany(mappedBy = "currentProject")
+    private List<SystemUser> users;
 
     public Project() {
     }
@@ -23,29 +42,29 @@ public class Project {
     public Project(String designation, String location) {
         this.designation = designation;
         this.location = location;
+        this.isActive = true;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public List<SystemUser> getUsersOnVacationOnMonth(int month, int year){
+        List<SystemUser> res = new ArrayList<>();
+        for(int i = 0 ; i < this.users.size(); i++) {
+            if (this.users.get(i).isUserOnVacationInMonth(month, year)) {
+                res.add(this.users.get(i));
+            }
+        }
+        return res;
     }
 
-    public Long getId() {
-        return id;
+    public void deactivate(){
+        this.isActive = false;
     }
 
-    public String getDesignation() {
-        return designation;
+    public void activate(){
+        this.isActive = true;
     }
 
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

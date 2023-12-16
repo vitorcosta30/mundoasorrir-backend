@@ -2,9 +2,12 @@ package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
+import com.mundoasorrir.mundoasorrirbackend.DTO.PresenceUser.PresenceUserDTO;
+import com.mundoasorrir.mundoasorrirbackend.DTO.PresenceUser.PresenceUserMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
@@ -118,5 +121,33 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ResponseMessage("There was an error in the activation the account"));
         }
     }
+    @GetMapping(value="/getPresences/{username}/{year}/{month}")
+    public ResponseEntity<?> getPresencesMoth(@PathVariable String username, @PathVariable int year , @PathVariable int month, HttpServletRequest request ) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
+        try{
+            List<Present> presences = this.userService.getPresencesInMonth(username,month,year);
+            return ResponseEntity.ok().body(PresenceUserMapper.toDTO(presences));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("There was an error in getting the presences"));
+        }
+
+    }
+
+    @GetMapping(value="/getPresences/{username}/{year}")
+    public ResponseEntity<?> getPresencesYear(@PathVariable String username, @PathVariable int year , HttpServletRequest request ) {
+        if(!this.authUtils.mediumPermissions(request)){
+            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+        }
+        try{
+            List<Present> presences = this.userService.getPresencesInYear(username,year);
+            return ResponseEntity.ok().body(PresenceUserMapper.toDTO(presences));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseMessage("There was an error in getting the presences"));
+        }
+
+    }
+
 
 }

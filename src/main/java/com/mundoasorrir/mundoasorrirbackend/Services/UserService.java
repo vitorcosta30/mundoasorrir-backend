@@ -1,5 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
-import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
+
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
@@ -7,12 +7,11 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.ProjectRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,6 +47,11 @@ public class UserService implements UserDetailsService{
     public List<Present> getPresencesInMonth(String username, int month, int year){
         return this.findUserByUsername(username).getPresencesInMonth(month, year);
     }
+
+    public List<Present> getPresencesInYear(String username, int year){
+        return this.findUserByUsername(username).getPresencesInYear(year);
+    }
+
 
 
     @Transactional

@@ -8,10 +8,15 @@ public class ProjectDTO {
 
     private String location;
 
-    public ProjectDTO(Long id, String designation, String location) {
+    private Boolean active;
+
+
+    public ProjectDTO(Long id, String designation, String location, boolean active) {
         this.id = id;
         this.designation = designation;
         this.location = location;
+        this.active = active;
+
     }
 
     public ProjectDTO(){}
@@ -38,5 +43,13 @@ public class ProjectDTO {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

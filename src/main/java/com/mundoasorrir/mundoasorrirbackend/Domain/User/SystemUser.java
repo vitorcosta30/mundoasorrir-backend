@@ -1,6 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
@@ -8,6 +9,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,11 +38,13 @@ public class SystemUser {
     @Column(nullable = false)
     private boolean isActive;
 
+    @Setter
     @Getter
     @ManyToOne(optional = true)
     private Project currentProject;
 
 
+    @Getter
     @ManyToMany(mappedBy = "enrolledUsers")
     private List<Event> event;
 
@@ -98,7 +102,18 @@ public class SystemUser {
         }
         return res;
     }
+    public List<Present> getPresencesInYear(int year){
+        List<Present> res = new ArrayList<>();
+        for(int i = 0 ; i < this.presence.size(); i++){
+            LocalDate localDate = this.presence.get(i).getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
+            if(localDate.getYear() == year){
+                res.add(this.presence.get(i));
+
+            }
+        }
+        return res;
+    }
 
 
     public void setUserId(Long identifier) {
@@ -139,12 +154,21 @@ public class SystemUser {
     public void setActive(boolean active) {
         isActive = active;
     }
+    public boolean isUserOnVacationInMonth(int month, int year){
+        for(int i = 0; i < this.event.size(); i++){
+            if(this.event.get(i).getEventType().getName().equals(BaseEventType.VACATION.getName())){
+                LocalDate localDateStart = this.event.get(i).getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate localDateEnd = this.event.get(i).getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if((localDateStart.getYear() == year || localDateEnd.getYear() == year) && (localDateStart.getMonthValue() == month && localDateEnd.getMonthValue() == month) ){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public void setSystemRole(Role systemRole) {
         this.systemRole = systemRole;
     }
 
-    public void setCurrentProject(Project currentProject) {
-        this.currentProject = currentProject;
-    }
 }

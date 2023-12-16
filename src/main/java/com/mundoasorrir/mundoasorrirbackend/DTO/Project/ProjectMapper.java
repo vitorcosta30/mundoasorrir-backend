@@ -8,7 +8,7 @@ import java.util.List;
 public class ProjectMapper {
 
     public static ProjectDTO toDTO(Project project){
-        return new ProjectDTO(project.getId(),project.getDesignation(),project.getLocation());
+        return new ProjectDTO(project.getId(),project.getDesignation(),project.getLocation(),project.isActive());
     }
 
     public static List<ProjectDTO> toDTO(List<Project> projects){
