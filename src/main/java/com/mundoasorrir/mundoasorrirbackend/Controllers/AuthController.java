@@ -75,8 +75,10 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        if(!this.userService.isUserActiveUsername(loginRequest.getUsername())){
-            return ResponseEntity.status(401).body(new ResponseMessage("Conta desativada, entre em contacto com alguem responsavel caso se trate de um erro"));
+        if(this.userService.existsByUsername(loginRequest.getUsername())) {
+            if (!this.userService.isUserActiveUsername(loginRequest.getUsername())) {
+                return ResponseEntity.status(401).body(new ResponseMessage("Conta desativada, entre em contacto com alguem responsavel caso se trate de um erro"));
+            }
         }
 
         Authentication authentication = authenticationManager
