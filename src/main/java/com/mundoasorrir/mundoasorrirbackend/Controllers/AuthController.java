@@ -105,7 +105,14 @@ public class AuthController {
     @GetMapping("/isLoggedIn")
     public ResponseEntity<Boolean> isLoggedIn(HttpServletRequest request) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body((!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty()) && this.authUtils.getUserFromRequest(request) != null);
+            if((!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty()) && this.authUtils.getUserFromRequest(request) != null){
+                return ResponseEntity.status(HttpStatus.OK).body(true);
+            }else{
+                ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+
+                return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(false);
+            }
+
         }catch(Exception e){
             ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
 
