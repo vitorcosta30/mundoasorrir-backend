@@ -107,7 +107,7 @@ public class AuthController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty());
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.OK).body(false);
+            return ResponseEntity.status(HttpStatus.OK).body(true);
 
         }
 
