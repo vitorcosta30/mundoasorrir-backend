@@ -5,6 +5,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
+import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
 import jakarta.persistence.*;
@@ -62,6 +63,8 @@ public class SystemUser {
     @OneToMany(mappedBy = "user")
     private List<Vacation> vacation;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private RefreshToken refreshToken;
 
     @OneToMany(mappedBy = "user")
     private List<Present> presence;
