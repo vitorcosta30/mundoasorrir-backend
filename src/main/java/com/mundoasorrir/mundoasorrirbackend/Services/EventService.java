@@ -48,7 +48,7 @@ public class EventService {
         if(this.eventTypeRepository.findByName(BaseEventType.VACATION.getName()).isPresent()){
             eventType = this.eventTypeRepository.findByName(BaseEventType.VACATION.getName()).get();
         }else{
-            eventType = BaseEventType.VACATION;
+            eventType = this.eventTypeRepository.save(BaseEventType.VACATION);
 
         }
 
