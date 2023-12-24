@@ -1,7 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Attendance;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Status;
-
 public class BasePresenceStatus {
 
     /**

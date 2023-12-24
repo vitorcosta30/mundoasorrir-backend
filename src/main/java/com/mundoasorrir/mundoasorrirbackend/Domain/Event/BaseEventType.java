@@ -1,7 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Event;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
-
 public class BaseEventType {
     public static final EventType MISSION = EventType.valueOf("MISSÃO");
     /**

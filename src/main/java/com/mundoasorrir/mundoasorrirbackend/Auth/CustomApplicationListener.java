@@ -1,6 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Auth;
 
-import com.mundoasorrir.mundoasorrirbackend.Controllers.EventsController;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;

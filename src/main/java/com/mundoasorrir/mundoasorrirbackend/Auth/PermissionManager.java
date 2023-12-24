@@ -3,10 +3,7 @@ package com.mundoasorrir.mundoasorrirbackend.Auth;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 @Component
 public class PermissionManager {
 

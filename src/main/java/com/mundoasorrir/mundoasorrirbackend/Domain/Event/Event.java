@@ -13,11 +13,7 @@ public class Event {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long eventId;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
+    @ManyToMany()
     private List<SystemUser> enrolledUsers;
 
     private String place;

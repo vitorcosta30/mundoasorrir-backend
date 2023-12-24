@@ -1,6 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Repositories;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

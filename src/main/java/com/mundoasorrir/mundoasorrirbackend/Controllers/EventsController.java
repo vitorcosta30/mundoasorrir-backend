@@ -8,16 +8,15 @@ import com.mundoasorrir.mundoasorrirbackend.DTO.Event.EventMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
-
+import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserGroupService;
+import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

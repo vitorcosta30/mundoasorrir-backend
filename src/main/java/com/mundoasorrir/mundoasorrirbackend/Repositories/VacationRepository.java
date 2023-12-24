@@ -1,6 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Repositories;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.BaseStatus;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Status;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;

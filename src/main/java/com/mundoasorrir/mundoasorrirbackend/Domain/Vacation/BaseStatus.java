@@ -1,7 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Vacation;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
-
 public class BaseStatus {
     /**
      * Coordenador

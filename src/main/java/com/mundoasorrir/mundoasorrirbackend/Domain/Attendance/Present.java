@@ -3,17 +3,16 @@ package com.mundoasorrir.mundoasorrirbackend.Domain.Attendance;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import jakarta.persistence.*;
-import org.springframework.data.util.Pair;
 
 @Entity
 public class Present {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long presenceId;
-    @ManyToOne( cascade =CascadeType.ALL)
+    @ManyToOne( )
     private SystemUser user;
 
-    @ManyToOne(cascade =CascadeType.ALL)
+    @ManyToOne()
     private Attendance attendance;
 
     @Embedded

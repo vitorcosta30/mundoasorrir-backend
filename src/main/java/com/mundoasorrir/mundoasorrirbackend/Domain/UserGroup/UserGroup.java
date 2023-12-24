@@ -1,11 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ public class UserGroup {
     @Getter
     private String groupDesignation;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     private SystemUser createdBy;
 
 
@@ -72,11 +69,11 @@ public class UserGroup {
     }
 
     public boolean isUserCreator(SystemUser user){
-        return this.createdBy.equals(user);
+        return this.createdBy != null && this.createdBy.equals(user);
     }
 
 
-        public Long getGroupId() {
+    public Long getGroupId() {
         return groupId;
     }
 
@@ -102,6 +99,10 @@ public class UserGroup {
 
     public List<SystemUser> getGroupUsers() {
         return groupUsers;
+    }
+
+    public void removeCreator(){
+        this.createdBy = null;
     }
 
     public void setGroupUsers(List<SystemUser> groupUsers) {

@@ -104,8 +104,15 @@ public class UserService implements UserDetailsService{
     @Transactional
     public void delete(SystemUser user){
         if(existsByUsername(user.getUsername())) {
-            this.userRepository.delete(findUserByUsername(user.getUsername()));
+            SystemUser deletingUser = this.findUserByUsername(user.getUsername());
+            deletingUser.removeRelations();
+            SystemUser updated = this.save(deletingUser);
+            this.deletion(updated);
         }
+    }
+    @Transactional
+    public void deletion(SystemUser user){
+        this.userRepository.delete(findUserByUsername(user.getUsername()));
     }
 
     public Boolean existsByUsername(String username){

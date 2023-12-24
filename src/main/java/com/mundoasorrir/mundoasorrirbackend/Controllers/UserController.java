@@ -2,18 +2,15 @@ package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
-import com.mundoasorrir.mundoasorrirbackend.DTO.PresenceUser.PresenceUserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.PresenceUser.PresenceUserMapper;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
-
 import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

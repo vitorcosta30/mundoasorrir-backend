@@ -1,13 +1,10 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Project;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 

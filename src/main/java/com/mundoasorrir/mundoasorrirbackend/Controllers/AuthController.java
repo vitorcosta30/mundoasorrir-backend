@@ -1,17 +1,9 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
-import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.SignupRequest;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
-
+import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.SignupRequest;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Response.UserInfoResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangeMyPasswordDTO;
@@ -19,19 +11,15 @@ import com.mundoasorrir.mundoasorrirbackend.DTO.ChangePassword.ChangePasswordDTO
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
-import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +33,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 //for Angular Client (withCredentials)

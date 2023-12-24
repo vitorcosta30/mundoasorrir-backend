@@ -2,7 +2,6 @@ package com.mundoasorrir.mundoasorrirbackend.DTO.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Project.ProjectDTO;
-import lombok.Getter;
 
 public class UserDTO {
     @JsonProperty("email")

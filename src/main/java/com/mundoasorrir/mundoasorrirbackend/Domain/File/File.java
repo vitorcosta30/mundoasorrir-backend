@@ -16,7 +16,7 @@ public class File {
     @ManyToMany
     private List<SystemUser> usersAllowed;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     private SystemUser sharedBy;
 
 
@@ -66,6 +66,8 @@ public class File {
         return this.usersAllowed.contains(user);
     }
 
+    public boolean isShared(SystemUser user){return this.sharedBy != null && this.sharedBy.equals(user);}
+
     public void setData(byte[] data) {
         this.data = data;
     }
@@ -77,5 +79,12 @@ public class File {
     public void setSharedBy(SystemUser sharedBy) {
         this.sharedBy = sharedBy;
         this.usersAllowed.add(sharedBy);
+    }
+    public void removeSharedBy(){
+        this.sharedBy = null;
+    }
+
+    public List<SystemUser> getUsersAllowed() {
+        return usersAllowed;
     }
 }

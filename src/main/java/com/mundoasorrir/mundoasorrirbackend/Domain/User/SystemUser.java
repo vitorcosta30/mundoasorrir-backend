@@ -14,7 +14,10 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "sys_user")
@@ -60,13 +63,13 @@ public class SystemUser {
     @OneToMany(mappedBy = "createdBy")
     private List<UserGroup> createdGroups;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Vacation> vacation;
 
     @OneToOne(cascade = CascadeType.ALL)
     private RefreshToken refreshToken;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Present> presence;
 
 
@@ -92,6 +95,40 @@ public class SystemUser {
             this.isActive = true;
         }
     }
+    public void removeRelations(){
+        removeEvents();
+        removeFiles();
+        removeGroups();
+
+    }
+    public void removeEvents(){
+        while(this.event.size() > 0){
+            this.event.get(0).getEnrolledUsers().remove(this);
+            this.event.remove(0);
+        }
+    }
+    public void removeFiles(){
+        while(this.file.size() > 0){
+            if(this.file.get(0).isShared(this)){
+                this.file.get(0).removeSharedBy();
+            }
+            this.file.get(0).getUsersAllowed().remove(this);
+            this.file.remove(0);
+
+        }
+    }
+    public void removeGroups(){
+        while(this.userGroup.size() > 0){
+            if(this.userGroup.get(0).isUserCreator(this)){
+                this.userGroup.get(0).removeCreator();
+            }
+            this.userGroup.get(0).getGroupUsers().remove(this);
+            this.userGroup.remove(0);
+        }
+    }
+
+
+
 
     public List<Present> getPresencesInMonth(int month, int year){
         List<Present> res = new ArrayList<>();

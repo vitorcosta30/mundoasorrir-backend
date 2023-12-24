@@ -1,7 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Event;
 
-import com.mundoasorrir.mundoasorrirbackend.Controllers.EventsController;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import jakarta.persistence.*;
 
 import java.util.Objects;

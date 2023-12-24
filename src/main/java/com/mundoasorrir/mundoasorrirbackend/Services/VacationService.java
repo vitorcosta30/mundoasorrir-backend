@@ -1,9 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
 
-import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.BaseStatus;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
-import com.mundoasorrir.mundoasorrirbackend.Repositories.UserGroupRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.VacationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
