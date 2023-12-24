@@ -76,6 +76,7 @@ public class VacationController {
         }
         Vacation vacation = new Vacation(startDateOb,endDateOb,user);
         this.vacationService.save(vacation);
+        logger.info("New vacation request created!!");
         return ResponseEntity.ok(new MessageResponse("Vacation request created successfully!"));
     }
 
@@ -127,8 +128,6 @@ public class VacationController {
             markedVacation.setEventType(BaseEventType.VACATION);
             eventTypeRepository.save(BaseEventType.VACATION);
             eventService.save(markedVacation);
-
-
 
             logger.info("Vacation request accepted;");
 

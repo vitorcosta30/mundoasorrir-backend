@@ -144,6 +144,7 @@ public class EventsController {
                 event.setEventType(eventTypes[i]);
                 eventTypeRepository.save(eventTypes[i]);
                 eventService.save(event);
+                logger.info("New event created!!");
                 return ResponseEntity.ok(new MessageResponse("Event created successfully!"));
             }
         }

@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,9 @@ public class UserController {
 
     @Autowired
     private final AuthUtils authUtils;
+
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
+
     @GetMapping(value = "/getInfo/{username}")
     public ResponseEntity<?> getUserInfo(@PathVariable String username, HttpServletRequest request) {
         if(!this.authUtils.lowPermissions(request)){

@@ -13,6 +13,8 @@ import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,9 @@ public class AttendanceController {
     @Autowired
 
     private final UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(AttendanceController.class);
+
     @GetMapping(value = "/getUsersBusyToday")
     public ResponseEntity<?> getBusyUsers(HttpServletRequest request) throws ParseException {
         if(!this.authUtils.lowPermissions(request)){
@@ -83,12 +88,14 @@ public class AttendanceController {
             obsDate = handleDate(date);
 
         }catch(Exception e){
+            logger.error("Not a valid date - "+ date );
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
         }
         if(!this.attendanceService.isInstantiated(obsDate)){
             List<SystemUser> users = userService.findAll();
             users.removeAll(eventService.usersBusy(obsDate));
             attendanceService.save(obsDate,users);
+            logger.info("Created new attendance for day - " + obsDate.toString() );
         }
         return ResponseEntity.ok().body(PresenceMapper.toDTO(this.attendanceService.getPresencesInDay(obsDate)));
     }
@@ -102,6 +109,7 @@ public class AttendanceController {
             obsDate = handleDate(date) ;
 
         }catch(Exception e){
+            logger.error("Not a valid date - "+ date );
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
         }
         if(!this.attendanceService.isInstantiated(obsDate)){
@@ -109,6 +117,8 @@ public class AttendanceController {
         }
         SystemUser user = this.userService.findUserByUsername(username);
         if(this.attendanceService.markAsPresent(obsDate,user) != null){
+            logger.info("Presence marked for user - "+ username + "in day" + obsDate.toString() );
+
             return ResponseEntity.ok().body(new MessageResponse("Presence marked successfully"));
 
         }else{
@@ -127,6 +137,8 @@ public class AttendanceController {
             obsDate = handleDate(date) ;
 
         }catch(Exception e){
+            logger.error("Not a valid date - "+ date );
+            logger.error("Not a valid date - "+ date );
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
         }
         if(!this.attendanceService.isInstantiated(obsDate)){
@@ -134,7 +146,9 @@ public class AttendanceController {
         }
         SystemUser user = this.userService.findUserByUsername(username);
         if(this.attendanceService.markAsAbsent(obsDate,user) != null){
-            return ResponseEntity.ok().body(new MessageResponse("Presence marked successfully"));
+            logger.info("Absence marked for user - "+ username + "in day" + obsDate.toString() );
+
+            return ResponseEntity.ok().body(new MessageResponse("Absence marked successfully"));
 
         }else{
             return ResponseEntity.badRequest().body(new MessageResponse("There has been an error"));
