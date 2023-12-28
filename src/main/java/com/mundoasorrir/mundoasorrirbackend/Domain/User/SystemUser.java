@@ -212,17 +212,10 @@ public class SystemUser {
     private boolean isMonthInPeriod(int month, int year, LocalDate start, LocalDate end){
         return isYearContained(year,start.getYear(),end.getYear()) && isOnVacation(month, year, start, end);
     }
-
-
-
-
     private boolean isOnVacation (int month, int year, LocalDate start, LocalDate end){
         return isOnVacationMultiYear(month,year,start,end) || isOnVacationSingleYear(month,start,end);
 
     }
-
-
-
     private boolean isOnVacationSingleYear(int month, LocalDate start, LocalDate end){
         return isSingleYear(start.getYear(),end.getYear()) && checkEventSingleYear(month,start.getMonthValue(),end.getMonthValue());
     }
@@ -242,31 +235,23 @@ public class SystemUser {
     private boolean isSingleYear(int start, int end){
         return start == end;
     }
-
-
-
     private boolean checkEventSingleYear(int month, int start, int end){
         return start <= month && end >= month;
     }
     private boolean checkMultiYearEvent(int month, int year, LocalDate start, LocalDate end){
-
         return checkStartingYear(month,year,start.getMonthValue(),start.getYear()) || checkYearsBetween(year,start.getYear(),end.getYear()) || checkEndingYear(month,year,end.getMonthValue(),end.getYear());
     }
 
     private boolean checkStartingYear(int month, int year, int startMonth, int startYear){
-
-
-
         return month >= startMonth && month <= 12 && year == startYear;
     }
 
     private boolean checkEndingYear(int month, int year, int endMonth, int endYear){
-
         return month <= endMonth && month >= 1 && year == endYear;
     }
     private boolean checkYearsBetween(int year, int start, int end){
         int diffYear = end - start;
-        return diffYear > 2 && year > start && year < end;
+        return diffYear >= 2 && year > start && year < end;
     }
 
     public void setSystemRole(Role systemRole) {
