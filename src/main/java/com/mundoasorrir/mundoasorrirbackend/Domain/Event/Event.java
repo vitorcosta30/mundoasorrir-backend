@@ -117,4 +117,8 @@ public class Event {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public boolean isVacation(){
+        return this.eventType.getName().equals(BaseEventType.VACATION.getName());
+    }
 }

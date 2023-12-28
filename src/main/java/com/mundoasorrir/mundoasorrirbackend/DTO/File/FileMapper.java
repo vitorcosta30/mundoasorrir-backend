@@ -22,6 +22,11 @@ public class FileMapper {
                 .path("/api/files/files/")
                 .path(file.getId().toString())
                 .toUriString();
-        return new FileDTO(file.getName(),fileDownloadUri,file.getType(),file.getData().length,file.getSharedBy().getUsername());
+        if(file.getSharedBy() != null){
+            return new FileDTO(file.getName(),fileDownloadUri,file.getType(),file.getData().length,file.getSharedBy().getUsername());
+
+        }else{
+            return new FileDTO(file.getName(),fileDownloadUri,file.getType(),file.getData().length,"");
+        }
     }
 }
