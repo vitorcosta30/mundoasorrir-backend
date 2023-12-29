@@ -13,7 +13,9 @@ import com.mundoasorrir.mundoasorrirbackend.DTO.User.UserMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Exception.TokenRefreshException;
+import com.mundoasorrir.mundoasorrirbackend.Message.ErrorMessage;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
+import com.mundoasorrir.mundoasorrirbackend.Message.SuccessMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
@@ -38,8 +40,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-//for Angular Client (withCredentials)
-//@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
+/**
+ *
+ */
 @CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
@@ -64,11 +67,17 @@ public class AuthController {
     JwtUtils jwtUtils;
     @Autowired
     RefreshTokenService refreshTokenService;
+
+    /**
+     *
+     * @param loginRequest
+     * @return
+     */
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         if(this.userService.existsByUsername(loginRequest.getUsername())) {
             if (!this.userService.isUserActiveUsername(loginRequest.getUsername())) {
-                return ResponseEntity.status(401).body(new ResponseMessage("Conta desativada, entre em contacto com alguem responsavel caso se trate de um erro"));
+                return ResponseEntity.status(401).body(ErrorMessage.ACCOUNT_DEACTIVATED);
             }
         }
 
@@ -93,10 +102,17 @@ public class AuthController {
                         roles));
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
+
     @GetMapping("/isLoggedIn")
     public ResponseEntity<Boolean> isLoggedIn(HttpServletRequest request) {
         try {
-            if((!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty()) && this.authUtils.getUserFromRequest(request) != null){
+            SystemUser user = authUtils.getUserFromRequest(request);
+            if((!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty()) && user != null && user.isActive()){
                 return ResponseEntity.status(HttpStatus.OK).body(true);
             }else{
                 ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
@@ -111,6 +127,12 @@ public class AuthController {
         }
 
     }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(HttpServletRequest request) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
@@ -118,99 +140,135 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(usr);
     }
 
+    /**
+     *
+     * @param signUpRequest
+     * @return
+     */
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userService.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.USERNAME_IN_USE);
         }
 
         if (userService.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.EMAIL_IN_USE);
         }
 
         if (this.userService.create(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getRole()) != null) {
             logger.info("User " + signUpRequest.getUsername() + " was created!");
-            return ResponseEntity.ok().body(new MessageResponse("User created successfully!!"));
+            return ResponseEntity.ok().body(SuccessMessage.USER_CREATED);
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Role does not exist!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ROLE_DOES_NOT_EXIST);
         }
     }
+
+    /**
+     *
+     * @param username
+     * @param newPassword
+     * @param request
+     * @return
+     */
 
     @PatchMapping("/changePassword/{username}")
     public ResponseEntity<?> changePassword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordDTO newPassword, HttpServletRequest request){
         if(!this.authUtils.highPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
 
         }
         if(!username.equals(newPassword.getUsername())){
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ILLEGAL_REQUEST);
         }
         SystemUser user = this.userService.findUserByUsername(newPassword.getUsername());
         user.setPassword(encoder.encode(newPassword.getNewPassword()));
         try{
             this.userService.save(user);
-            return ResponseEntity.ok().body(new MessageResponse("Password updated successfully!!"));
+            return ResponseEntity.ok().body(SuccessMessage.PASSWORD_WAS_UPDATED);
 
         }catch(Exception e){
-            return ResponseEntity.badRequest().body(new MessageResponse("There was an error!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
 
         }
 
     }
+
+    /**
+     *
+     * @param newPassword
+     * @param request
+     * @return
+     */
     @PatchMapping("/changeMyPassword")
     public ResponseEntity<?> changePassword(@RequestBody ChangeMyPasswordDTO newPassword, HttpServletRequest request){
         SystemUser user = this.authUtils.getUserFromRequest(request);
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
 
         }
         if(!this.encoder.matches(newPassword.getOldPassword(),user.getPassword())){
             logger.info(newPassword.getOldPassword()+  "-"+ user.getPassword());
 
-            return ResponseEntity.status(403).body(new MessageResponse("Password is wrong!!"));
+            return ResponseEntity.status(403).body(ErrorMessage.WRONG_PASSWORD);
         }
         if(!newPassword.getReNewPassword().equals(newPassword.getNewPassword())){
-            return ResponseEntity.status(401).body(new MessageResponse("Passwords dont match!!"));
+            return ResponseEntity.status(401).body(ErrorMessage.PASSWORDS_DONT_MATCH);
         }
         user.setPassword(this.encoder.encode(newPassword.getNewPassword()));
         if(this.userService.save(user) != null){
-            return ResponseEntity.ok().body(new MessageResponse("Password updated successfully!!"));
+            return ResponseEntity.ok().body(SuccessMessage.PASSWORD_WAS_UPDATED);
         }else{
-            return ResponseEntity.badRequest().body(new MessageResponse("There was an error!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
 
         }
 
     }
 
-
-
-
-        @PutMapping(value = "/updateUser/{idUser}")
+    /**
+     *
+     * @param idUser
+     * @param updatedUser
+     * @param request
+     * @return
+     */
+    @PutMapping(value = "/updateUser/{idUser}")
     public ResponseEntity<?> editUser(@PathVariable Long idUser, @RequestBody UserDTO updatedUser  , HttpServletRequest request){
         if(!this.authUtils.highPermissions(request)){
-            return ResponseEntity.badRequest().body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.NOT_ALLOWED);
 
         }
 
         if(!idUser.toString().equals(updatedUser.getId())){
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Allowed!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ILLEGAL_REQUEST);
         }
         try{
             this.userService.updateUser(idUser,updatedUser);
-            return ResponseEntity.ok().body(new ResponseMessage("Data updated successfuly!!"));
+            return ResponseEntity.ok().body(SuccessMessage.DATA_WAS_UPDATED);
 
         }catch(Exception e){
-            return ResponseEntity.badRequest().body(new ResponseMessage("An Error has occurred!!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
 
         }
     }
+
+    /**
+     *
+     * @return
+     */
 
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse("You've been signed out!"));
+                .body(SuccessMessage.SIGNED_OUT);
     }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
 
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
@@ -225,13 +283,13 @@ public class AuthController {
 
                         return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new MessageResponse("Token is refreshed successfully!"));
+                                .body(SuccessMessage.TOKEN_REFRESHED);
                     })
                     .orElseThrow(() -> new TokenRefreshException(refreshToken,
                             "Refresh token is not in database!"));
         }
 
-        return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
+        return ResponseEntity.badRequest().body(ErrorMessage.TOKEN_EMPTY);
     }
 
 }

@@ -4,4 +4,14 @@ public class SuccessMessage {
     public static final ResponseMessage MARKED_PRESENCE_SUCCESS = new ResponseMessage("Presença marcada com sucesso!");
     public static final ResponseMessage MARKED_ABSENCE_SUCCESS = new ResponseMessage("Falta marcada com sucesso!");
 
+    public static final ResponseMessage SIGNED_OUT = new ResponseMessage("Terminou a sessão!!");
+
+    public static final ResponseMessage DATA_WAS_UPDATED = new ResponseMessage("Dados atualizados com sucesso!!");
+
+    public static final ResponseMessage PASSWORD_WAS_UPDATED = new ResponseMessage("Password foi atualizada com sucesso!!");
+
+    public static final ResponseMessage USER_CREATED = new ResponseMessage("Utilizador criado com sucesso!!");
+
+    public static final ResponseMessage TOKEN_REFRESHED = new ResponseMessage("Token foi atualizado!!");
+
 }
