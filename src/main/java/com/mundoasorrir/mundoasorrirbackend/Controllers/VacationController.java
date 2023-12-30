@@ -10,6 +10,8 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
+import com.mundoasorrir.mundoasorrirbackend.Message.ErrorMessage;
+import com.mundoasorrir.mundoasorrirbackend.Message.SuccessMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.EventService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
@@ -30,6 +32,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ */
 @Slf4j
 @CrossOrigin(origins = "${mundoasorrir.app.frontend}", maxAge = 3600, allowCredentials = "true")
 @RestController
@@ -49,19 +54,32 @@ public class VacationController {
     JwtUtils jwtUtils;
     private final EventTypeRepository eventTypeRepository;
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     @GetMapping(value = "/getPendingRequests")
     public ResponseEntity<?> getPendingRequests(HttpServletRequest request) {
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         List<VacationDTO> res = VacationMapper.toDTO(this.vacationService.getPendingRequests());
         return ResponseEntity.ok().body(res);
     }
 
+    /**
+     *
+     * @param startDate
+     * @param endDate
+     * @param request
+     * @return
+     */
+
     @PostMapping(value = "/createRequest")
     public ResponseEntity<?> createRequest(@RequestParam("startDate") String startDate,@RequestParam("endDate") String endDate, HttpServletRequest request ){
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         SystemUser user = this.userService.findUserByUsername(username);
@@ -72,38 +90,52 @@ public class VacationController {
             startDateOb = dateFormat.parse(startDate);
             endDateOb = dateFormat.parse(endDate);
         }catch(Exception e){
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.INVALID_DATE);
         }
         Vacation vacation = new Vacation(startDateOb,endDateOb,user);
         this.vacationService.save(vacation);
         logger.info("New vacation request created!!");
-        return ResponseEntity.ok(new MessageResponse("Vacation request created successfully!"));
+        return ResponseEntity.ok(SuccessMessage.VACATION_REQUEST_CREATED);
     }
+
+    /**
+     *
+     * @param requestId
+     * @param request
+     * @return
+     */
 
     @PostMapping(value = "/rejectRequest")
     public ResponseEntity<?> rejectRequest(@RequestParam("requestId")Long  requestId, HttpServletRequest request){
         if(!this.authUtils.mediumPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
 
         }
         try{
             this.vacationService.rejectVacation(requestId);
             logger.info("Vacation request rejected.");
 
-            return ResponseEntity.ok(new MessageResponse("Vacation request rejected successfully!"));
+            return ResponseEntity.ok(SuccessMessage.VACATION_REJECTED);
 
         }catch(Exception e){
             logger.info("Error rejecting vacation request.");
 
-            return ResponseEntity.badRequest().body(new MessageResponse("There was an error in rejecting the request"));
+            return ResponseEntity.badRequest().body(ErrorMessage.VACATION_REJECT_FAILED);
         }
     }
+
+    /**
+     *
+     * @param requestId
+     * @param request
+     * @return
+     */
 
 
     @PostMapping(value = "/acceptRequest")
     public ResponseEntity<?> acceptRequest(@RequestParam("requestId")Long  requestId, HttpServletRequest request){
         if(!this.authUtils.mediumPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
 
         }
         try{
@@ -120,7 +152,7 @@ public class VacationController {
                     markedVacation.setEventType(eventTypesSaved.get(i));
                     eventService.save(markedVacation);
                     logger.info("Vacation request accepted;");
-                    return ResponseEntity.ok(new MessageResponse("Vacation request accepted successfully!"));
+                    return ResponseEntity.ok(SuccessMessage.VACATION_ACCEPTED);
 
                 }
             }
@@ -131,16 +163,23 @@ public class VacationController {
 
             logger.info("Vacation request accepted;");
 
-            return ResponseEntity.ok(new MessageResponse("Vacation request accepted successfully!"));
+            return ResponseEntity.ok(SuccessMessage.VACATION_ACCEPTED);
 
         }catch(Exception e){
-            return ResponseEntity.badRequest().body(new MessageResponse("There was an error in accepting the request"));
+            return ResponseEntity.badRequest().body(ErrorMessage.VACATION_ACCEPT_FAILED);
         }
     }
+
+    /**
+     *
+     * @param obsDate
+     * @param request
+     * @return
+     */
     @PostMapping("/getActiveVacations")
     public ResponseEntity<?> getActiveVacations(@RequestParam("obsDate") String obsDate,HttpServletRequest request) {
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dateOb;
@@ -149,13 +188,20 @@ public class VacationController {
             List<VacationDTO> res = VacationMapper.toDTO(this.vacationService.getActiveVacations(dateOb));
             return ResponseEntity.ok(res);
         }catch(Exception e){
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Not a valid date!"));
+            return ResponseEntity.badRequest().body(ErrorMessage.INVALID_DATE);
         }
     }
+
+    /**
+     *
+     * @param request
+     * @return
+     * @throws ParseException
+     */
     @GetMapping("/getActiveVacationsToday")
     public ResponseEntity<?> getActiveVacations(HttpServletRequest request) throws ParseException {
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("No permission for this funcionality!!"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date today = new Date();
@@ -166,10 +212,4 @@ public class VacationController {
         return ResponseEntity.ok(res);
 
     }
-
-
-
-
-
-
 }
