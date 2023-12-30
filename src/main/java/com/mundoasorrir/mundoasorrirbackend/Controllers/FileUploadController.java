@@ -10,7 +10,9 @@ import com.mundoasorrir.mundoasorrirbackend.DTO.UploadInfo.UploadInfoMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
+import com.mundoasorrir.mundoasorrirbackend.Message.ErrorMessage;
 import com.mundoasorrir.mundoasorrirbackend.Message.ResponseMessage;
+import com.mundoasorrir.mundoasorrirbackend.Message.SuccessMessage;
 import com.mundoasorrir.mundoasorrirbackend.Services.FileUploadService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserGroupService;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
@@ -54,11 +56,19 @@ public class FileUploadController {
     @Autowired
     JwtUtils jwtUtils;
 
+    /**
+     *
+     * @param file
+     * @param users
+     * @param groups
+     * @param request
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/upload")
-    //@PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam(value = "users", required = false) List<String> users,@RequestParam(value = "groups" , required = false) List<String> groups, HttpServletRequest request) throws IOException {
         if(!this.authUtils.lowPermissions(request)){
-            return ResponseEntity.status(401).body(new ResponseMessage("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
 
         List<SystemUser> usersAllowed = new ArrayList<>();
@@ -74,26 +84,23 @@ public class FileUploadController {
         }
         usersAllowed = usersAllowed.stream().distinct().toList();
         List<SystemUser> usersAlowedMut = new ArrayList<>(usersAllowed);
-
-
-
-        String message = "";
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
         SystemUser user = this.userService.findUserByUsername(username);
-
-
         try {
             fileUploadService.store(file, usersAlowedMut, user);
-            message = "Uploaded the file successfully: " + file.getOriginalFilename();
             logger.info("New file uploaded");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+            return ResponseEntity.status(HttpStatus.OK).body(SuccessMessage.FILE_UPLOADED);
 
         } catch (Exception e) {
-            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(ErrorMessage.FILE_UPLOAD_FAILED);
         }
     }
 
+    /**
+     *
+     * @param groups
+     * @return
+     */
 
 
     private List<SystemUser> getUsersFromGroup(List<Long> groups){
@@ -113,19 +120,26 @@ public class FileUploadController {
         return res;
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
+
     @GetMapping("/files")
     public ResponseEntity<?> getListFiles(HttpServletRequest request) {
         if(!this.authUtils.highPermissions(request)){
-            return ResponseEntity.status(401).body(new MessageResponse("Not allowed"));
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-
-
-
         List<FileDTO> files = FileMapper.toDTO(fileUploadService.getAllFiles(username).toList());
-
         return ResponseEntity.status(HttpStatus.OK).body(files);
     }
+
+    /**
+     *
+     * @return
+     */
 
     @GetMapping("/maxUploadSize")
     public ResponseEntity<UploadInfoDTO> getMaxUploadSize() {
@@ -134,11 +148,23 @@ public class FileUploadController {
         return ResponseEntity.status(HttpStatus.OK).body(uploadInfo);
 
     }
+
+    /**
+     *
+     * @return
+     */
     @GetMapping("/maxUploadSizeString")
     public ResponseEntity<String> getMaxUploadSizeString() {
         return ResponseEntity.status(HttpStatus.OK).body(env.getProperty("spring.servlet.multipart.max-file-size"));
 
     }
+
+    /**
+     *
+     * @param id
+     * @param request
+     * @return
+     */
 
     @GetMapping("/files/{id}")
     public ResponseEntity<?> getFile(@PathVariable Long id, HttpServletRequest request ) {
@@ -146,19 +172,12 @@ public class FileUploadController {
         SystemUser user = this.userService.findUserByUsername(username);
         if(fileUploadService.getFile(id).isUserAllowed(user)){
             File fileDB = fileUploadService.getFile(id);
-
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getName() + "\"")
                     .body(fileDB.getData());
         }else{
-            String message = "Not allowed";
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMessage(message));
-
-
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorMessage.NOT_ALLOWED);
         }
-
-
-
     }
 
 }
