@@ -16,4 +16,10 @@ public class SuccessMessage {
 
     public static final ResponseMessage TOKEN_REFRESHED = new ResponseMessage("Token foi atualizado!!");
 
+    public static final ResponseMessage VACATION_ACCEPTED = new ResponseMessage("Pedido de férias foi aceite com sucesso!!");
+
+
+    public static final ResponseMessage VACATION_REJECTED = new ResponseMessage("Pedido de férias foi rejeitado com sucesso!!");
+    public static final ResponseMessage VACATION_REQUEST_CREATED = new ResponseMessage("Pedido de férias foi criado com sucesso!!");
+
 }

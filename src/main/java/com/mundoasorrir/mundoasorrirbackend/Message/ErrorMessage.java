@@ -24,6 +24,9 @@ public class ErrorMessage {
     public static final ResponseMessage EVENT_TYPE_NULL= new ResponseMessage("Tipo de evento está vazio!!");
     public static final ResponseMessage EVENT_TYPE_NOT_EXIST= new ResponseMessage("Tipo de evento não existe!!");
     public static final ResponseMessage FILE_UPLOAD_FAILED= new ResponseMessage("Upload de ficheiro falhou!!");
+    public static final ResponseMessage VACATION_REJECT_FAILED= new ResponseMessage("Pedido para rejeitar pedido de férias falhou!!");
+    public static final ResponseMessage VACATION_ACCEPT_FAILED= new ResponseMessage("Pedido para aceitar pedido de férias falhou!!");
+
 
 
 
