@@ -21,6 +21,13 @@ public class ErrorMessage {
 
     public static final ResponseMessage TOKEN_EMPTY= new ResponseMessage("Token está vazio!!");
 
+    public static final ResponseMessage EVENT_TYPE_NULL= new ResponseMessage("Tipo de evento está vazio!!");
+    public static final ResponseMessage EVENT_TYPE_NOT_EXIST= new ResponseMessage("Tipo de evento não existe!!");
+    public static final ResponseMessage FILE_UPLOAD_FAILED= new ResponseMessage("Upload de ficheiro falhou!!");
+
+
+
+
 
 
 }

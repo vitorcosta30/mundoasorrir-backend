@@ -5,6 +5,8 @@ public class SuccessMessage {
     public static final ResponseMessage MARKED_ABSENCE_SUCCESS = new ResponseMessage("Falta marcada com sucesso!");
 
     public static final ResponseMessage SIGNED_OUT = new ResponseMessage("Terminou a sessão!!");
+    public static final ResponseMessage EVENT_CREATED = new ResponseMessage("Evento criado com sucesso!!");
+    public static final ResponseMessage FILE_UPLOADED= new ResponseMessage("Ficheiro enviado com sucesso!!");
 
     public static final ResponseMessage DATA_WAS_UPDATED = new ResponseMessage("Dados atualizados com sucesso!!");
 
