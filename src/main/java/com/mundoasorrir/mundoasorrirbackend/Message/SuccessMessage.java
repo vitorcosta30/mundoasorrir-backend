@@ -21,5 +21,15 @@ public class SuccessMessage {
 
     public static final ResponseMessage VACATION_REJECTED = new ResponseMessage("Pedido de férias foi rejeitado com sucesso!!");
     public static final ResponseMessage VACATION_REQUEST_CREATED = new ResponseMessage("Pedido de férias foi criado com sucesso!!");
+    public static final ResponseMessage ACCOUNT_DEACTIVATED = new ResponseMessage("Conta desativada com sucesso!!");
+    public static final ResponseMessage ACCOUNT_ACTIVATED = new ResponseMessage("Conta ativada com sucesso!!");
+    public static final ResponseMessage PROJECT_DEACTIVATED = new ResponseMessage("Projecto desativado com sucesso!!");
+    public static final ResponseMessage PROJECT_ACTIVATED = new ResponseMessage("Projecto ativado com sucesso!!");
+    public static final ResponseMessage PROJECT_CREATED = new ResponseMessage("Projecto criado com sucesso!!");
+
+    public static final ResponseMessage USER_ADDED = new ResponseMessage("Utilizador adicionado com sucesso!!");
+    public static final ResponseMessage USER_REMOVED = new ResponseMessage("Utilizador removido com sucesso!!");
+
+    public static final ResponseMessage LEFT_GROUP = new ResponseMessage("Saiu do grupo com sucesso!!");
 
 }
