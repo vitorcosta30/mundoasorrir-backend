@@ -1,7 +1,6 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.User;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.Attendance.Present;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
@@ -13,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -133,11 +131,11 @@ public class SystemUser {
 
     public List<Present> getPresencesInMonth(int month, int year){
         List<Present> res = new ArrayList<>();
-        for(int i = 0 ; i < this.presence.size(); i++){
-            LocalDate localDate = this.presence.get(i).getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        for (Present present : this.presence) {
+            LocalDate localDate = present.getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            if(localDate.getMonthValue() == month && localDate.getYear() == year){
-                res.add(this.presence.get(i));
+            if (localDate.getMonthValue() == month && localDate.getYear() == year) {
+                res.add(present);
 
             }
         }
@@ -145,11 +143,10 @@ public class SystemUser {
     }
     public List<Present> getPresencesInYear(int year){
         List<Present> res = new ArrayList<>();
-        for(int i = 0 ; i < this.presence.size(); i++){
-            LocalDate localDate = this.presence.get(i).getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-            if(localDate.getYear() == year){
-                res.add(this.presence.get(i));
+        for (Present present : this.presence) {
+            LocalDate localDate = present.getAttendance().getDayAttendance().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if (localDate.getYear() == year) {
+                res.add(present);
 
             }
         }
@@ -196,8 +193,8 @@ public class SystemUser {
         isActive = active;
     }
     public boolean isUserOnVacationInMonth(int month, int year){
-        for(int i = 0; i < this.event.size(); i++){
-            if(isOnVacation(this.event.get(i),month,year)){
+        for (Event value : this.event) {
+            if (isOnVacation(value, month, year)) {
                 return true;
             }
         }
