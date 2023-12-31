@@ -1,5 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Attendance;
 
+import lombok.Getter;
+
+@Getter
 public class PresenceStatus {
 
     private String status;
@@ -47,10 +50,6 @@ public class PresenceStatus {
         return BasePresenceStatus.ABSENT.getStatus();
     }
 
-
-    public String getStatus() {
-        return status;
-    }
 
     public void setStatus(String status) {
         this.status = status;
