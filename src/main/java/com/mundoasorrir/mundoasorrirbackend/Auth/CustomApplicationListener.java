@@ -26,7 +26,6 @@ public class CustomApplicationListener implements ApplicationListener<Applicatio
     public void onApplicationEvent(ApplicationReadyEvent event) {
         if(env.containsProperty(bootstrap) && env.getProperty(bootstrap).equals("true")){
             logger.warn("First run option was activated, access first run user profile and create user profiles and follow instructions on configuration manual!!");
-
             if(this.userDetailsService.existsByUsername(this.firstUser.getUsername())){
                 this.userDetailsService.activateUser(this.firstUser.getUsername());
                 logger.warn("First run user was activated!! Reminder to do restart the back end after doing what needs to be done with this user!!");

@@ -33,6 +33,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,7 +95,8 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
         logger.info("User "+ userDetails.getUsername() +  " logged in!");
-
+        refreshTokenService.deleteByUserId(userDetails.getId());
+        refreshTokenService.createRefreshToken(userDetails.getUsername(),jwtCookie);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(new UserInfoResponse(userDetails.getId(),
                         userDetails.getUsername(),
@@ -258,8 +260,9 @@ public class AuthController {
      */
 
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+        refreshTokenService.deleteByUserId(authUtils.getUserFromRequest(request).getUserId());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(SuccessMessage.SIGNED_OUT);
     }
@@ -273,22 +276,34 @@ public class AuthController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
         String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
-
         if ((refreshToken != null) && (refreshToken.length() > 0)) {
-            return refreshTokenService.findByToken(refreshToken)
-                    .map(refreshTokenService::verifyExpiration)
-                    .map(RefreshToken::getUser)
-                    .map(user -> {
-                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(UserDetailsImpl.build(user));
+            if(refreshTokenService.findByToken(refreshToken).isPresent()){
+                RefreshToken token = refreshTokenService.findByToken(refreshToken).get();
+                SystemUser user = token.getUser();
+                try{
+                    refreshTokenService.verifyExpiration(token);
+                    refreshTokenService.deleteByUserId(user.getUserId());
+                    UserDetailsImpl details = UserDetailsImpl.build(user);
+                    ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(UserDetailsImpl.build(user));
+                    refreshTokenService.createRefreshToken(details.getUsername(),jwtCookie);
+                    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                            .body(SuccessMessage.TOKEN_REFRESHED);
+                }catch(TokenRefreshException e){
+                    logger.info("Token is expired!!");
+                    UserDetailsImpl details = UserDetailsImpl.build(user);
+                    ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(UserDetailsImpl.build(user));
+                    refreshTokenService.createRefreshToken(details.getUsername(),jwtCookie);
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                            .body(SuccessMessage.TOKEN_REFRESHED);
+                }
 
-                        return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(SuccessMessage.TOKEN_REFRESHED);
-                    })
-                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                            "Refresh token is not in database!"));
+            }else{
+                return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
+
+            }
         }
-
+        logger.info("Token is empty!!");
         return ResponseEntity.badRequest().body(ErrorMessage.TOKEN_EMPTY);
     }
 

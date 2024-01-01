@@ -35,6 +35,13 @@ public class UserService implements UserDetailsService{
     @Autowired
     ProjectService projectService;
 
+    /**
+     *
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,13 +51,37 @@ public class UserService implements UserDetailsService{
         return UserDetailsImpl.build(systemUser);
     }
 
+    /**
+     *
+     * @param username
+     * @param month
+     * @param year
+     * @return
+     */
+
     public List<Present> getPresencesInMonth(String username, int month, int year){
         return this.findUserByUsername(username).getPresencesInMonth(month, year);
     }
 
+    /**
+     *
+     * @param username
+     * @param year
+     * @return
+     */
+
     public List<Present> getPresencesInYear(String username, int year){
         return this.findUserByUsername(username).getPresencesInYear(year);
     }
+
+    /**
+     *
+     * @param username
+     * @param email
+     * @param password
+     * @param role
+     * @return
+     */
 
 
 
@@ -58,6 +89,13 @@ public class UserService implements UserDetailsService{
     public SystemUser create(String username,String email, String password, String role){
         return this.save(new SystemUser(username,email,encoder.encode(password)), role);
     }
+
+    /**
+     *
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
 
     public SystemUser findUserByUsername(String username) throws UsernameNotFoundException {
         if(userRepository.findByUsername(username).isPresent()){
@@ -67,10 +105,22 @@ public class UserService implements UserDetailsService{
         }
 
     }
+
+    /**
+     *
+     * @return
+     */
     public List<SystemUser> findAll()  {
 
         return   userRepository.findAll();
     }
+
+    /**
+     *
+     * @param user
+     * @param role
+     * @return
+     */
     @Transactional
     public SystemUser save(SystemUser user, String role){
         String strRoles = role;
@@ -79,24 +129,28 @@ public class UserService implements UserDetailsService{
         if(strRoles == null ){
             return null;
         }
-        for(int i = 0 ; i < roles.length ; i++){
-            if( strRoles.equals(roles[i].getName())){
-
-                for(int x = 0 ; x < rolesSaved.size();x++){
-                    if(rolesSaved.get(x).getName().equals(roles[i].getName())){
-
-                        user.setRoles(rolesSaved.get(x));
+        for (Role value : roles) {
+            if (strRoles.equals(value.getName())) {
+                for (Role item : rolesSaved) {
+                    if (item.getName().equals(value.getName())) {
+                        user.setRoles(item);
                         return this.save(user);
                     }
                 }
-                user.setRoles(roles[i]);
-                roleRepository.save(roles[i]);
+                user.setRoles(value);
+                roleRepository.save(value);
 
                 return this.save(user);
             }
         }
         return this.save(user);
     }
+
+    /**
+     *
+     * @param user
+     * @return
+     */
 
     public SystemUser save(SystemUser user){
         return this.userRepository.save(user);
@@ -110,24 +164,55 @@ public class UserService implements UserDetailsService{
             this.deletion(updated);
         }
     }
+
+    /**
+     *
+     * @param user
+     */
     @Transactional
     public void deletion(SystemUser user){
         this.userRepository.delete(findUserByUsername(user.getUsername()));
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
+
     public Boolean existsByUsername(String username){
         return this.userRepository.existsByUsername(username);
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     */
+
     public Boolean existsByEmail(String email){
         return this.userRepository.existsByEmail(email);
     }
+
+    /**
+     *
+     *
+     * @param email
+     * @return
+     */
 
 
     public Boolean isUserActiveEmail(String email){
         return this.userRepository.isUserActivateEmail(email);
 
     }
+
+    /**
+     *
+     * @param id
+     * @param user
+     * @return
+     */
     public Boolean existsByEmail(Long id,UserDTO user){
         if(!existsByEmail(user.getEmail())){
             return false;
@@ -137,6 +222,13 @@ public class UserService implements UserDetailsService{
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param user
+     * @return
+     */
+
     public Boolean existsByUsername(Long id,UserDTO user){
         if(!existsByUsername(user.getUsername())){
             return false;
@@ -145,6 +237,13 @@ public class UserService implements UserDetailsService{
             return !userWithEmail.getUsername().equalsIgnoreCase(user.getUsername());
         }
     }
+
+    /**
+     *
+     * @param id
+     * @param updatedData
+     * @return
+     */
 
     public SystemUser updateUser(Long id, UserDTO updatedData){
         SystemUser user = this.userRepository.getReferenceById(id);
@@ -157,15 +256,33 @@ public class UserService implements UserDetailsService{
 
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
+
     public Boolean isUserActiveUsername(String username){
         return this.userRepository.isUserActivateUsername(username);
     }
+
+    /**
+     *
+     * @param username user to be deactivated
+     * @return result of the operation
+     */
 
     public SystemUser deactivateUser(String username){
         SystemUser user = findUserByUsername(username);
         user.deactivate();
         return save(user);
     }
+
+    /**
+     *
+     * @param username user to be activated
+     * @return result of the operation
+     */
     public SystemUser activateUser(String username){
         SystemUser user = findUserByUsername(username);
         user.activate();

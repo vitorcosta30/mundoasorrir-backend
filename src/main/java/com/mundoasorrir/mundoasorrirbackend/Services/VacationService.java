@@ -24,12 +24,30 @@ public class VacationService {
      */
     public Vacation getReferanceById(Long id){return this.vacationRepository.getReferenceById(id);}
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+
 
     public Vacation getById(Long id){return this.vacationRepository.getVacationByVacationId(id);}
+
+    /**
+     *
+     * @param vacation
+     * @return
+     */
 
     public Vacation save(Vacation vacation){
         return this.vacationRepository.save(vacation);
     }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
 
     public Vacation acceptVacation(Long id){
         Vacation vacation = this.getById(id);
@@ -37,15 +55,32 @@ public class VacationService {
         return this.save(vacation);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+
     public Vacation rejectVacation(Long id){
         Vacation vacation = this.getById(id);
         vacation.rejectRequest();
         return this.save(vacation);
     }
 
+    /**
+     *
+     * @return
+     */
+
     public List<Vacation> getPendingRequests(){
         return this.vacationRepository.findVacationsByRequestStatusEquals(BaseStatus.PENDING);
     }
+
+    /**
+     *
+     * @param obsDate
+     * @return
+     */
 
     public List<Vacation> getActiveVacations(Date obsDate){
         return this.vacationRepository.activeVacations(obsDate,BaseStatus.ACCEPTED);
