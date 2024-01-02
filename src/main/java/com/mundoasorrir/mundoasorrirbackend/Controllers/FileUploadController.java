@@ -128,7 +128,7 @@ public class FileUploadController {
 
     @GetMapping("/files")
     public ResponseEntity<?> getListFiles(HttpServletRequest request) {
-        if(!this.authUtils.highPermissions(request)){
+        if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));

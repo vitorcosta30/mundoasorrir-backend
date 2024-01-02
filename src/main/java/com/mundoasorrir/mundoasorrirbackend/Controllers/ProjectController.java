@@ -80,7 +80,7 @@ public class ProjectController {
 
     @GetMapping("/getAllProjects")
     public ResponseEntity<?> getAllProjects( HttpServletRequest request){
-        if(!this.authUtils.highPermissions(request)){
+        if(!this.authUtils.mediumPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
 

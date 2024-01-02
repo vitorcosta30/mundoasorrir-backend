@@ -80,7 +80,7 @@ public class UserController {
 
     @GetMapping(value = "/getUsers")
     public ResponseEntity<?> getUsers(HttpServletRequest request) {
-        if(!this.authUtils.highPermissions(request)){
+        if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
         List<UserDTO> res = UserMapper.toDTO(userService.findAll());
