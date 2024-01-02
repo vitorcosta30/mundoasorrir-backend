@@ -16,6 +16,9 @@ public class VacationService {
     @Autowired
     private final VacationRepository vacationRepository;
 
+    @Autowired
+    private final EventService eventService;
+
 
     /**
      * returns copy of object, used when it comes to listings

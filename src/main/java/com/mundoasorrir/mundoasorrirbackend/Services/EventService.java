@@ -4,10 +4,13 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
+import com.mundoasorrir.mundoasorrirbackend.Message.ErrorMessage;
+import com.mundoasorrir.mundoasorrirbackend.Message.SuccessMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,6 +37,31 @@ public class EventService {
 
     public Event getEventFromId(Long id){
         return this.eventRepository.getReferenceById(id);
+    }
+
+
+    public Event create(Event event, String eventType){
+        EventType[] eventTypes = BaseEventType.eventTypes();
+        List<EventType> eventTypesSaved = eventTypeRepository.findAll();
+        if(eventType == null ){
+            return null;
+        }
+        for(int i = 0 ; i < eventTypes.length ; i++){
+            if( eventType.equals(eventTypes[i].getName())){
+                for(int x = 0 ; x < eventTypesSaved.size();x++){
+                    if(eventTypesSaved.get(x).equals(eventTypes[i])){
+                        event.setEventType(eventTypesSaved.get(x));
+                        return save(event);
+                    }
+                }
+                event.setEventType(eventTypes[i]);
+                eventTypeRepository.save(eventTypes[i]);
+                return save(event);
+            }
+        }
+        return null;
+
+
     }
 
 

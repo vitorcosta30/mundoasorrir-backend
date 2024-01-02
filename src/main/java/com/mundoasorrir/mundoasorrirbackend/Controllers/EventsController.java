@@ -127,58 +127,26 @@ public class EventsController {
         usersEnrolled.add(this.authUtils.getUserFromRequest(request));
         usersEnrolled = usersEnrolled.stream().distinct().toList();
 
-
-
-
-        String message = "";
-
         Date startDateOb;
         Date endDateOb;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         try{
              startDateOb = dateFormat.parse(startDate);
              endDateOb = dateFormat.parse(endDate);
-
-
         }catch(Exception e){
             return ResponseEntity.badRequest().body(ErrorMessage.INVALID_DATE);
-
-
         }
 
         Event event = new Event(usersEnrolled,place,description,startDateOb,endDateOb);
-
-
-
-
-
-
-        EventType[] eventTypes = BaseEventType.eventTypes();
-        List<EventType> eventTypesSaved = eventTypeRepository.findAll();
         if(eventType == null ){
             return ResponseEntity.badRequest().body(ErrorMessage.EVENT_TYPE_NULL);
         }
-        for(int i = 0 ; i < eventTypes.length ; i++){
-            if( eventType.equals(eventTypes[i].getName())){
+        if(eventService.create(event,eventType) != null){
+            return ResponseEntity.ok(SuccessMessage.EVENT_CREATED);
 
-                for(int x = 0 ; x < eventTypesSaved.size();x++){
-                    if(eventTypesSaved.get(x).equals(eventTypes[i])){
-                        event.setEventType(eventTypesSaved.get(x));
-                        eventService.save(event);
-                        return ResponseEntity.ok(SuccessMessage.EVENT_CREATED);
-                    }
-                }
-                event.setEventType(eventTypes[i]);
-                eventTypeRepository.save(eventTypes[i]);
-                eventService.save(event);
-                logger.info("New event created!!");
-                return ResponseEntity.ok(SuccessMessage.EVENT_CREATED);
-            }
+        }else{
+            return ResponseEntity.badRequest().body(ErrorMessage.EVENT_TYPE_NOT_EXIST);
         }
-
-        return ResponseEntity.badRequest().body(ErrorMessage.EVENT_TYPE_NOT_EXIST);
-
-
 
     }
 
