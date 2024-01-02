@@ -113,8 +113,7 @@ public class AuthController {
     @GetMapping("/isLoggedIn")
     public ResponseEntity<Boolean> isLoggedIn(HttpServletRequest request) {
         try {
-            SystemUser user = authUtils.getUserFromRequest(request);
-            if((!jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)).isEmpty()) && user != null && user.isActive()){
+            if(this.authUtils.isLoggedIn(request)){
                 return ResponseEntity.status(HttpStatus.OK).body(true);
             }else{
                 ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
@@ -149,7 +148,11 @@ public class AuthController {
      */
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, HttpServletRequest request) {
+        if(!this.authUtils.highPermissions(request)){
+            return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
+
+        }
         if (userService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body(ErrorMessage.USERNAME_IN_USE);
         }
@@ -160,7 +163,7 @@ public class AuthController {
 
         if (this.userService.create(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getRole()) != null) {
             logger.info("User " + signUpRequest.getUsername() + " was created!");
-            return ResponseEntity.ok().body(SuccessMessage.USER_CREATED);
+            return ResponseEntity.status(201).body(SuccessMessage.USER_CREATED);
         } else {
             return ResponseEntity.badRequest().body(ErrorMessage.ROLE_DOES_NOT_EXIST);
         }

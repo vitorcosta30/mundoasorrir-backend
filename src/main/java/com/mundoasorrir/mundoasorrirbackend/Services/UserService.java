@@ -63,6 +63,7 @@ public class UserService implements UserDetailsService{
         return this.findUserByUsername(username).getPresencesInMonth(month, year);
     }
 
+
     /**
      *
      * @param username
@@ -115,6 +116,10 @@ public class UserService implements UserDetailsService{
         return   userRepository.findAll();
     }
 
+    public Role[] getSystemRoles(){
+        return BaseRoles.systemRoles();
+    }
+
     /**
      *
      * @param user
@@ -124,7 +129,7 @@ public class UserService implements UserDetailsService{
     @Transactional
     public SystemUser save(SystemUser user, String role){
         String strRoles = role;
-        Role[] roles = BaseRoles.systemRoles();
+        Role[] roles = getSystemRoles();
         List<Role> rolesSaved = roleRepository.findAll();
         if(strRoles == null ){
             return null;
