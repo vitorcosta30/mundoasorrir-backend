@@ -2,14 +2,13 @@ package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
 import com.mundoasorrir.mundoasorrirbackend.Auth.JwtUtils;
-import com.mundoasorrir.mundoasorrirbackend.Auth.Response.MessageResponse;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Vacation.VacationDTO;
 import com.mundoasorrir.mundoasorrirbackend.DTO.Vacation.VacationMapper;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.BaseEventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.Event;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Event.EventType;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.VacationRequest;
 import com.mundoasorrir.mundoasorrirbackend.Message.ErrorMessage;
 import com.mundoasorrir.mundoasorrirbackend.Message.SuccessMessage;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.EventTypeRepository;
@@ -92,7 +91,7 @@ public class VacationController {
         }catch(Exception e){
             return ResponseEntity.badRequest().body(ErrorMessage.INVALID_DATE);
         }
-        Vacation vacation = new Vacation(startDateOb,endDateOb,user);
+        VacationRequest vacation = new VacationRequest(startDateOb,endDateOb,user);
         this.vacationService.save(vacation);
         logger.info("New vacation request created!!");
         return ResponseEntity.ok(SuccessMessage.VACATION_REQUEST_CREATED);
@@ -140,12 +139,12 @@ public class VacationController {
         }
         try{
             this.vacationService.acceptVacation(requestId);
-            Vacation vacation = this.vacationService.getById(requestId);
+            VacationRequest vacationRequest = this.vacationService.getById(requestId);
             String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
             String description = "Aprovado por: " + username;
             List<SystemUser> users = new ArrayList<>();
-            users.add(vacation.getUser());
-            Event markedVacation = new Event(users,"Não definido",description,vacation.getStartDate(),vacation.getEndDate());
+            users.add(vacationRequest.getUser());
+            Event markedVacation = new Event(users,"Não definido",description, vacationRequest.getStartDate(), vacationRequest.getEndDate());
             List<EventType> eventTypesSaved = eventTypeRepository.findAll();
             for(int i = 0; i  < eventTypesSaved.size(); i++){
                 if(BaseEventType.VACATION.equals(eventTypesSaved.get(i))){

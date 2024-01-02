@@ -6,7 +6,7 @@ import lombok.Getter;
 
 import java.util.Date;
 @Entity
-public class Vacation {
+public class VacationRequest {
 
     @Getter
     @Id
@@ -24,14 +24,14 @@ public class Vacation {
     @Embedded
     public Status requestStatus;
 
-    public Vacation(Date startDate, Date endDate, SystemUser user) {
+    public VacationRequest(Date startDate, Date endDate, SystemUser user) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.user = user;
         this.requestStatus = new Status();
     }
 
-    public Vacation() {
+    public VacationRequest() {
 
     }
 

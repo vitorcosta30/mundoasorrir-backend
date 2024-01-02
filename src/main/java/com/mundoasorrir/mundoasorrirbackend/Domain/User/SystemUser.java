@@ -6,7 +6,7 @@ import com.mundoasorrir.mundoasorrirbackend.Domain.File.File;
 import com.mundoasorrir.mundoasorrirbackend.Domain.Project.Project;
 import com.mundoasorrir.mundoasorrirbackend.Domain.RefreshToken;
 import com.mundoasorrir.mundoasorrirbackend.Domain.UserGroup.UserGroup;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.VacationRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,7 +63,7 @@ public class SystemUser {
     private List<UserGroup> createdGroups;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Vacation> vacation;
+    private List<VacationRequest> vacation;
 
     @OneToOne(cascade = CascadeType.ALL)
     private RefreshToken refreshToken;

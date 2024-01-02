@@ -213,7 +213,6 @@ public class AuthController {
 
         }
         if(!this.encoder.matches(newPassword.getOldPassword(),user.getPassword())){
-            logger.info(newPassword.getOldPassword()+  "-"+ user.getPassword());
 
             return ResponseEntity.status(403).body(ErrorMessage.WRONG_PASSWORD);
         }

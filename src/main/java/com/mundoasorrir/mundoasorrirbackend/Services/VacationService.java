@@ -1,7 +1,7 @@
 package com.mundoasorrir.mundoasorrirbackend.Services;
 
 import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.BaseStatus;
-import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.Vacation;
+import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.VacationRequest;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.VacationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class VacationService {
      * @param id
      * @return
      */
-    public Vacation getReferanceById(Long id){return this.vacationRepository.getReferenceById(id);}
+    public VacationRequest getReferanceById(Long id){return this.vacationRepository.getReferenceById(id);}
 
     /**
      *
@@ -31,7 +31,7 @@ public class VacationService {
      */
 
 
-    public Vacation getById(Long id){return this.vacationRepository.getVacationByVacationId(id);}
+    public VacationRequest getById(Long id){return this.vacationRepository.getVacationByVacationId(id);}
 
     /**
      *
@@ -39,7 +39,7 @@ public class VacationService {
      * @return
      */
 
-    public Vacation save(Vacation vacation){
+    public VacationRequest save(VacationRequest vacation){
         return this.vacationRepository.save(vacation);
     }
 
@@ -49,8 +49,8 @@ public class VacationService {
      * @return
      */
 
-    public Vacation acceptVacation(Long id){
-        Vacation vacation = this.getById(id);
+    public VacationRequest acceptVacation(Long id){
+        VacationRequest vacation = this.getById(id);
         vacation.acceptRequest();
         return this.save(vacation);
     }
@@ -61,10 +61,10 @@ public class VacationService {
      * @return
      */
 
-    public Vacation rejectVacation(Long id){
-        Vacation vacation = this.getById(id);
-        vacation.rejectRequest();
-        return this.save(vacation);
+    public VacationRequest rejectVacation(Long id){
+        VacationRequest vacationRequest = this.getById(id);
+        vacationRequest.rejectRequest();
+        return this.save(vacationRequest);
     }
 
     /**
@@ -72,7 +72,7 @@ public class VacationService {
      * @return
      */
 
-    public List<Vacation> getPendingRequests(){
+    public List<VacationRequest> getPendingRequests(){
         return this.vacationRepository.findVacationsByRequestStatusEquals(BaseStatus.PENDING);
     }
 
@@ -82,7 +82,7 @@ public class VacationService {
      * @return
      */
 
-    public List<Vacation> getActiveVacations(Date obsDate){
+    public List<VacationRequest> getActiveVacations(Date obsDate){
         return this.vacationRepository.activeVacations(obsDate,BaseStatus.ACCEPTED);
     }
 
