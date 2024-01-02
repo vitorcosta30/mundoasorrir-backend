@@ -46,10 +46,10 @@ public class PermissionManager {
         return this.LOW_PERMISSIONS;
     }
     public int hasMediumPermissions(){
-        return this.LOW_PERMISSIONS;
+        return this.MEDIUM_PERMISSIONS;
     }
     public int hasHighPermissions(){
-        return this.LOW_PERMISSIONS;
+        return this.HIGH_PERMISSIONS;
     }
 
 
