@@ -171,8 +171,12 @@ public class EventsController {
         if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
-        EventDTO res = EventMapper.toDTO(eventService.getEventFromId(id));
-        return ResponseEntity.ok().body(res);
+        try {
+            EventDTO res = EventMapper.toDTO(eventService.getEventFromId(id));
+            return ResponseEntity.ok().body(res);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
+        }
     }
 
     /**
