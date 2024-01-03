@@ -54,11 +54,13 @@ public class UserController {
         if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
+        try {
 
-        UserDTO user = UserMapper.toDTO(this.userService.findUserByUsername(username));
-
-
-        return ResponseEntity.ok().body(user);
+            UserDTO user = UserMapper.toDTO(this.userService.findUserByUsername(username));
+            return ResponseEntity.ok().body(user);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
+        }
     }
 
     /**
