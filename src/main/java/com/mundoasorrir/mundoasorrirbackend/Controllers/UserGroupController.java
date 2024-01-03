@@ -114,12 +114,16 @@ public class UserGroupController {
         if(!this.authUtils.lowPermissions(request)){
             return ResponseEntity.status(401).body(ErrorMessage.NOT_ALLOWED);
         }
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-        if(isUserInGroup(username,id)){
-            return ResponseEntity.ok().body(UserGroupMapper.toDTO(this.userGroupService.getByGroupId(id)));
-        }else{
-            return ResponseEntity.badRequest().body(ErrorMessage.NOT_ALLOWED);
+        try {
+            String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
+            if (isUserInGroup(username, id)) {
+                return ResponseEntity.ok().body(UserGroupMapper.toDTO(this.userGroupService.getByGroupId(id)));
+            } else {
+                return ResponseEntity.badRequest().body(ErrorMessage.NOT_ALLOWED);
 
+            }
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
         }
 
     }
