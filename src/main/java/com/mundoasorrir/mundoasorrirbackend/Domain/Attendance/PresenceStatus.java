@@ -1,8 +1,10 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Attendance;
 
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 @Getter
+@Embeddable
 public class PresenceStatus {
 
     private String status;

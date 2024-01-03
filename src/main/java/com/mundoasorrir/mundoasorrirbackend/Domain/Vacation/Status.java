@@ -1,7 +1,8 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Vacation;
 
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
-
+@Embeddable
 public class Status {
 
     @Getter
