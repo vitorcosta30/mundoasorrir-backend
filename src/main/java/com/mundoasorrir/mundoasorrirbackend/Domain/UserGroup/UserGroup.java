@@ -33,6 +33,8 @@ public class UserGroup {
         this.groupDesignation = groupDesignation;
         this.createdBy = createdBy;
         this.groupUsers = new ArrayList<>();
+        this.groupUsers.add(createdBy);
+
     }
 
     public UserGroup() {
@@ -46,6 +48,8 @@ public class UserGroup {
         this.createdBy = createdBy;
 
         this.groupUsers = groupUsers;
+        this.groupUsers.add(createdBy);
+
     }
 
     public void addUser(SystemUser newUser){

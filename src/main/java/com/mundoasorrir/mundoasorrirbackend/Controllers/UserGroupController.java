@@ -71,7 +71,6 @@ public class UserGroupController {
 
 
         String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request));
-        usersInGroup.add(this.userService.findUserByUsername(username));
 
         String message = "";
         usersInGroup = usersInGroup.stream().distinct().toList();
