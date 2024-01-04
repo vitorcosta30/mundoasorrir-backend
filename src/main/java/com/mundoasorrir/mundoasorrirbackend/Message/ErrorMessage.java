@@ -7,6 +7,7 @@ public class ErrorMessage {
     public static final ResponseMessage ERROR = new ResponseMessage("Aconteceu um erro!!");
     public static final ResponseMessage NOT_ALLOWED = new ResponseMessage("Não tem acesso a esta funcionalidade!!");
 
+    public static final ResponseMessage FILE_ERROR = new ResponseMessage("Aconteceu um erro no upload do ficheiro!!");
 
 
 
