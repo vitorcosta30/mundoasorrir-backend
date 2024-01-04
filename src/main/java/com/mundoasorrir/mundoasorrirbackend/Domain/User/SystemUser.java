@@ -78,6 +78,13 @@ public class SystemUser {
         this.password = password;
         this.isActive = true;
         this.currentProject = null;
+        this.vacation = new ArrayList<>();
+        this.createdGroups = new ArrayList<>();
+        this.userGroup = new ArrayList<>();
+        this.sharedFiles = new ArrayList<>();
+        this.file = new ArrayList<>();
+        this.event = new ArrayList<>();
+
     }
 
     public SystemUser() {
@@ -251,8 +258,5 @@ public class SystemUser {
         return diffYear >= 2 && year > start && year < end;
     }
 
-    public void setSystemRole(Role systemRole) {
-        this.systemRole = systemRole;
-    }
 
 }
