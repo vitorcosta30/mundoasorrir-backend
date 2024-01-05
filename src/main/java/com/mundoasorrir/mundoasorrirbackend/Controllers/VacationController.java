@@ -47,7 +47,7 @@ public class VacationController {
     private static final Logger logger = LoggerFactory.getLogger(VacationController.class);
 
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     @Autowired
     JwtUtils jwtUtils;

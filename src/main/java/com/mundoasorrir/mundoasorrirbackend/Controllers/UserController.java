@@ -38,7 +38,7 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 

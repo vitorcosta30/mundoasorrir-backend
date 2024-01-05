@@ -40,7 +40,7 @@ public class AttendanceController {
     @Autowired
     private AttendanceService attendanceService;
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
     @Autowired
 
     private final UserService userService;

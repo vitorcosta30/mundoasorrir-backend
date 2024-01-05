@@ -47,12 +47,13 @@ public class FileUploadController {
     @Autowired
     private Environment env;
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
+    @Autowired
+    private UserGroupService userGroupService;
 
-    private final UserGroupService userGroupService;
     @Autowired
     JwtUtils jwtUtils;
 

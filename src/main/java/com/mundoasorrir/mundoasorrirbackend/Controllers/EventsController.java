@@ -53,7 +53,7 @@ public class EventsController {
     @Autowired
     EventTypeRepository eventTypeRepository;
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     private final UserService userService;
 

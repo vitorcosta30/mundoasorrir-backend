@@ -40,7 +40,7 @@ public class UserGroupController {
     private final UserService userService;
 
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     private final UserGroupService userGroupService;
     @Autowired
@@ -74,7 +74,9 @@ public class UserGroupController {
 
         String message = "";
         usersInGroup = usersInGroup.stream().distinct().toList();
-        UserGroup userGroup = new UserGroup(groupName,this.userService.findUserByUsername(username),groupDesignation,usersInGroup);
+        List<SystemUser> usersInGroupMut = new ArrayList<>(usersInGroup);
+
+        UserGroup userGroup = new UserGroup(groupName,this.userService.findUserByUsername(username),groupDesignation,usersInGroupMut);
 
         try {
             userGroupService.save(userGroup);

@@ -36,7 +36,7 @@ public class ProjectController {
     @Autowired
     JwtUtils jwtUtils;
     @Autowired
-    private final AuthUtils authUtils;
+    private AuthUtils authUtils;
 
     /**
      *
