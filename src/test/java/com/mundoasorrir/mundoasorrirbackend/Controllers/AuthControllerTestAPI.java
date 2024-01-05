@@ -1,6 +1,5 @@
 package com.mundoasorrir.mundoasorrirbackend.Controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mundoasorrir.mundoasorrirbackend.Auth.AuthUtils;
@@ -9,13 +8,10 @@ import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.LoginRequest;
 import com.mundoasorrir.mundoasorrirbackend.Auth.Requests.SignupRequest;
 import com.mundoasorrir.mundoasorrirbackend.Config.SecurityConfig;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.BaseRoles;
-import com.mundoasorrir.mundoasorrirbackend.Domain.User.Role;
 import com.mundoasorrir.mundoasorrirbackend.Domain.User.SystemUser;
 import com.mundoasorrir.mundoasorrirbackend.MundoasorrirBackendApplication;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.RoleRepository;
 import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
-import com.mundoasorrir.mundoasorrirbackend.Services.RefreshTokenService;
-import com.mundoasorrir.mundoasorrirbackend.Services.UserDetailsImpl;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -26,18 +22,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -49,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = MundoasorrirBackendApplication.class)
-class AuthControllerTest {
+class AuthControllerTestAPI {
     private ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
     @Autowired
     ObjectMapper objectMapper;

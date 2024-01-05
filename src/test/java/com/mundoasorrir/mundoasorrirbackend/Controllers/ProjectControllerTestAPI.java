@@ -11,12 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.notNull;
 
-class ProjectControllerTest {
+class ProjectControllerTestAPI {
     @InjectMocks
     private ProjectService projectService;
     @Mock
