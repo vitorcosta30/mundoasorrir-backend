@@ -82,25 +82,21 @@ class UserControllerTestAPI {
     @Test
     void getUsersAuthenticated() throws Exception {
         MockitoAnnotations.initMocks(this);
-
         Mockito.when(authUtils.lowPermissions((HttpServletRequest)notNull())).thenReturn(true);
-
-
         Mockito.when(userService.findAll()).thenReturn(this.users);
-
-
         mockMvc.perform(get("/api/users/getUsers")).andDo(print()).andExpect(status().is(HttpStatus.OK.value()));
-
-
     }
+
+
     @Test
     void getUsersNotAuthenticated() throws Exception {
         MockitoAnnotations.initMocks(this);
         Mockito.when(authUtils.lowPermissions((HttpServletRequest)notNull())).thenReturn(false);
         Mockito.when(userService.findAll()).thenReturn(this.users);
         mockMvc.perform(get("/api/users/getUsers")).andDo(print()).andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
-
     }
+
+
 
     @Test
     void getExistingUserNotAuthenticated() throws Exception {
@@ -108,7 +104,6 @@ class UserControllerTestAPI {
         Mockito.when(authUtils.lowPermissions((HttpServletRequest)notNull())).thenReturn(false);
         Mockito.when(userService.findUserByUsername(this.diretor.getUsername())).thenReturn(this.diretor);
         mockMvc.perform(get("/api/users/getInfo/diretor")).andDo(print()).andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
-
     }
 
     @Test
@@ -117,7 +112,6 @@ class UserControllerTestAPI {
         Mockito.when(authUtils.lowPermissions((HttpServletRequest)notNull())).thenReturn(true);
         Mockito.when(userService.findUserByUsername(this.diretor.getUsername())).thenReturn(null);
         mockMvc.perform(get("/api/users/getInfo/nonexisting")).andDo(print()).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
-
     }
 
 

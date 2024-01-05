@@ -54,20 +54,27 @@ class SystemUserTest {
     void testRoleManager(){
         assertEquals(this.manager.getRole(), BaseRoles.MANAGER);
     }
-    @Test
 
+
+    @Test
     void testIsOnVacationTrue(){
         Assertions.assertTrue(this.diretor.isUserOnVacationInMonth(12,2023));
+    }
+
+    @Test
+    void testIsOnVacationTrueMultiyear(){
+        Assertions.assertTrue(this.diretor.isUserOnVacationInMonth(12,2024));
+        Assertions.assertTrue(this.diretor.isUserOnVacationInMonth(1,2025));
 
     }
+
     @Test
 
     void testIsOnVacationFalse(){
         Assertions.assertFalse(this.diretor.isUserOnVacationInMonth(11,2023));
         Assertions.assertFalse(this.diretor.isUserOnVacationInMonth(2,2024));
-
-
     }
+
     @Test
     void testIsActive(){
         Assertions.assertTrue(this.diretor.isActive());
@@ -80,7 +87,7 @@ class SystemUserTest {
 
     }
     @Test
-    void testIsOnVacationTrueMultiYear(){
+    void testActivate(){
         Assertions.assertTrue(this.diretor.isActive());
         this.diretor.deactivate();
         Assertions.assertFalse(this.diretor.isActive());

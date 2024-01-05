@@ -15,6 +15,7 @@ import com.mundoasorrir.mundoasorrirbackend.Repositories.UserRepository;
 import com.mundoasorrir.mundoasorrirbackend.Services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -73,16 +74,13 @@ class AuthControllerTestAPI {
     @Mock
     private SecurityConfig securityConfig;
 
-    private LoginRequest request;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-        userService.create("testUser","testEmail","testing", BaseRoles.DIRECTOR.getName());
-        request.setPassword("testing");
-        request.setUsername("testUser");
+
 
     }
 
@@ -94,19 +92,15 @@ class AuthControllerTestAPI {
         Mockito.when(jwtUtils.getCleanJwtCookie()).thenReturn(ResponseCookie.from("mundoasorrir", null).path("/api").build());
         Mockito.when(userService.getSystemRoles()).thenReturn(BaseRoles.systemRoles());
         mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-
-
         SignupRequest sRequest = new SignupRequest();
-
         sRequest.setUsername("testUser");
         sRequest.setRole(BaseRoles.DIRECTOR.getName());
         sRequest.setEmail("testUser@isep.pt");
         sRequest.setPassword("testUser");
         Mockito.when(userService.create(sRequest.getUsername(),sRequest.getEmail(),sRequest.getPassword(),BaseRoles.DIRECTOR.getName())).thenReturn(new SystemUser());
-
-
-        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8).content(ow.writeValueAsString(sRequest))).andDo(print()).andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
-
+        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8).content(ow.writeValueAsString(sRequest)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
     }
 
 
@@ -118,18 +112,15 @@ class AuthControllerTestAPI {
         Mockito.when(jwtUtils.getCleanJwtCookie()).thenReturn(ResponseCookie.from("mundoasorrir", null).path("/api").build());
         Mockito.when(userService.getSystemRoles()).thenReturn(BaseRoles.systemRoles());
         mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-
-
         SignupRequest sRequest = new SignupRequest();
-
         sRequest.setUsername("testUser");
         sRequest.setRole(BaseRoles.DIRECTOR.getName());
         sRequest.setEmail("testUser@isep.pt");
         sRequest.setPassword("testUser");
         Mockito.when(userService.create(sRequest.getUsername(),sRequest.getEmail(),sRequest.getPassword(),BaseRoles.DIRECTOR.getName())).thenReturn(new SystemUser());
-
-
-        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8).content(ow.writeValueAsString(sRequest))).andDo(print()).andExpect(status().is(HttpStatus.CREATED.value()));
+        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8).content(ow.writeValueAsString(sRequest)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()));
 
     }
 
@@ -141,19 +132,15 @@ class AuthControllerTestAPI {
         Mockito.when(securityConfig.passwordEncoder()).thenReturn(new BCryptPasswordEncoder());
         Mockito.when(jwtUtils.getCleanJwtCookie()).thenReturn(ResponseCookie.from("mundoasorrir", null).path("/api").build());
         Mockito.when(userService.getSystemRoles()).thenReturn(BaseRoles.systemRoles());
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-
-
         SignupRequest sRequest = new SignupRequest();
-
         sRequest.setUsername("testUser");
         sRequest.setRole(BaseRoles.DIRECTOR.getName());
         sRequest.setEmail("testUser@isep.pt");
         sRequest.setPassword("testUser");
         Mockito.when(userService.create(sRequest.getUsername(),sRequest.getEmail(),sRequest.getPassword(),BaseRoles.DIRECTOR.getName())).thenReturn(null);
-
-
-        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8).content(ow.writeValueAsString(sRequest))).andDo(print()).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(ow.writeValueAsString(sRequest)))
+                .andDo(print()).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
 
     }
 
@@ -161,25 +148,27 @@ class AuthControllerTestAPI {
     void isLoggedInTrue() throws Exception {
         MockitoAnnotations.initMocks(this);
         Mockito.when(authUtils.isLoggedIn((HttpServletRequest)notNull())).thenReturn(true);
-
-        Mockito.when(securityConfig.passwordEncoder()).thenReturn(new BCryptPasswordEncoder());
         Mockito.when(jwtUtils.getCleanJwtCookie()).thenReturn(ResponseCookie.from("mundoasorrir", null).path("/api").build());
         Mockito.when(userService.getSystemRoles()).thenReturn(BaseRoles.systemRoles());
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-        mockMvc.perform(get("/api/auth/isLoggedIn")).andDo(print()).andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string("true"));
-
-
+        mockMvc.perform(get("/api/auth/isLoggedIn"))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().string("true"));
 
     }
+
+
+
     @Test
     void isLoggedInFalse() throws Exception {
-        MockitoAnnotations.initMocks(this);
         Mockito.when(authUtils.isLoggedIn((HttpServletRequest)notNull())).thenReturn(false);
 
         Mockito.when(securityConfig.passwordEncoder()).thenReturn(new BCryptPasswordEncoder());
         Mockito.when(jwtUtils.getCleanJwtCookie()).thenReturn(ResponseCookie.from("mundoasorrir", null).path("/api").build());
         Mockito.when(userService.getSystemRoles()).thenReturn(BaseRoles.systemRoles());
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).addPlaceholderValue("mundoasorrir.app.frontend","http://some.url.com").build();
-        mockMvc.perform(get("/api/auth/isLoggedIn")).andDo(print()).andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string("false"));
+        mockMvc.perform(get("/api/auth/isLoggedIn"))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().string("false"));
     }
 }

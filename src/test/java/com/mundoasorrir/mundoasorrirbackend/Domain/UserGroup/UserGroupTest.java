@@ -20,7 +20,6 @@ class UserGroupTest {
     SystemUser diretor;
     SystemUser employee;
     SystemUser manager;
-    List<SystemUser> users;
     UserGroup userGroup;
 
 
@@ -33,9 +32,6 @@ class UserGroupTest {
         this.manager.setRoles(BaseRoles.MANAGER);
         this.employee = new SystemUser("employee", "employee@gmail.com","testpassword");
         this.employee.setRoles(BaseRoles.EMPLOYEE);
-        this.users = new ArrayList<>();
-        users.add(this.diretor);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         userGroup = new UserGroup("Testing group", this.diretor,"test1");
     }
     @Test

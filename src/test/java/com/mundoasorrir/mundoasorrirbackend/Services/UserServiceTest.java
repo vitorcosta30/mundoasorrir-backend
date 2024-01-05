@@ -47,16 +47,16 @@ class UserServiceTest {
 
 
     @Test
-    void test(){
+    void testFindUser(){
         when(userRepository.findByUsername("diretor")).thenReturn(Optional.of(this.diretor));
         assertEquals(userService.findUserByUsername("diretor"), this.diretor);
 
     }
 
     @Test
-    void testUserNonExisting(){
+    void testFindUserNonExisting(){
         when(userRepository.findByUsername("diretor")).thenReturn(Optional.empty());
-        assertNull(userService.findUserByUsername("nonexisting"));
+        assertNull(userService.findUserByUsername("diretor"));
     }
 
     @Test
