@@ -278,7 +278,6 @@ public class AuthController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
         String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
-
         if ((refreshToken != null) && (refreshToken.length() > 0)) {
             if(refreshTokenService.findByToken(refreshToken).isPresent()){
                 RefreshToken token = refreshTokenService.findByToken(refreshToken).get();
@@ -297,17 +296,17 @@ public class AuthController {
 
                 }catch(TokenRefreshException e){
                     logger.info("Token is expired!!");
-                    UserDetailsImpl details = UserDetailsImpl.build(user);
-                    ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(UserDetailsImpl.build(user));
-                    refreshTokenService.createRefreshToken(details.getUsername(),jwtCookie);
+                    ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
                     return ResponseEntity.ok()
                             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                             .body(SuccessMessage.TOKEN_REFRESHED);
                 }
 
             }else{
-                return ResponseEntity.badRequest().body(ErrorMessage.ERROR);
-
+                ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
+                return ResponseEntity.badRequest()
+                        .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                        .body(ErrorMessage.ERROR);
             }
         }
         logger.info("Token is empty!!");
