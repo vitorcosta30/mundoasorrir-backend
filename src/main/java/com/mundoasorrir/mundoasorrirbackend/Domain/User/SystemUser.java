@@ -65,7 +65,7 @@ public class SystemUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<VacationRequest> vacation;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private RefreshToken refreshToken;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
