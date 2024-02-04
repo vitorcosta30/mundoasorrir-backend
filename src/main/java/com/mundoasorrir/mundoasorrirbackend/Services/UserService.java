@@ -35,6 +35,10 @@ public class UserService implements UserDetailsService{
     @Autowired
     ProjectService projectService;
 
+    @Autowired
+    RefreshTokenService refreshTokenService;
+
+
     /**
      *
      * @param username
@@ -165,6 +169,7 @@ public class UserService implements UserDetailsService{
         if(existsByUsername(user.getUsername())) {
             SystemUser deletingUser = this.findUserByUsername(user.getUsername());
             deletingUser.removeRelations();
+            this.refreshTokenService.deleteByUserId(deletingUser.getUserId());
             SystemUser updated = this.save(deletingUser);
             this.deletion(updated);
         }
