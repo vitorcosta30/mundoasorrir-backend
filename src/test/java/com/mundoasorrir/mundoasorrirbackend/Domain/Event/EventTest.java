@@ -1,27 +1,35 @@
 package com.mundoasorrir.mundoasorrirbackend.Domain.Event;
 
+import com.mundoasorrir.mundoasorrirbackend.Domain.Vacation.VacationRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventTest {
+    Event e1;
+
+    Event e2;
+
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        e1 = new Event(new ArrayList<>(),dateFormat.parse("2023-12-15"),dateFormat.parse("2023-12-30"), BaseEventType.MEETING);
+        e2 = new Event(new ArrayList<>(),dateFormat.parse("2023-12-15"),dateFormat.parse("2023-12-30"), BaseEventType.MISSION);
+
     }
 
     @Test
     void isUserEnrolled() {
     }
 
-    @Test
-    void getEventId() {
-    }
-
-    @Test
-    void setEventId() {
-    }
 
     @Test
     void getEnrolledUsers() {
@@ -77,5 +85,8 @@ class EventTest {
 
     @Test
     void isVacation() {
+        Assertions.assertFalse(this.e1.isVacation());
+        Assertions.assertFalse(this.e2.isVacation());
+
     }
 }

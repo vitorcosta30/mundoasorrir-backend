@@ -29,7 +29,11 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint{
         final Map<String, Object> body = new HashMap<>();
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
-        body.put("message", "Aconteceu um erro desconhecido!!");
+        if(authException.getMessage().equalsIgnoreCase("Bad credentials")){
+            body.put("message", "Credenciais erradas!!");
+        }else{
+            body.put("message", "Aconteceu um erro desconhecido!!");
+        }
         body.put("path", request.getServletPath());
 
         final ObjectMapper mapper = new ObjectMapper();
